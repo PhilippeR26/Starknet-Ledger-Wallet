@@ -1,0 +1,40 @@
+{
+  "name": "cairo1-js",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/next-js": "^2.2.0",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@ledgerhq/hw-transport-webhid": "^6.29.0",
+    "@starknet-io/types-js": "^0.7.7",
+    "@types/node": "20.14.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "dotenv": "^16.4.5",
+    "framer-motion": "^11.2.14",
+    "material-react-toastify": "^2.0.1",
+    "next": "^14.2.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "server-only": "^0.0.1",
+    "sharp": "^0.33.4",
+    "starknet": "^6.11.0",
+    "swr": "^2.2.5",
+    "typescript": "^5.5.3",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "encoding": "^0.1.13",
+    "simple-zustand-devtools": "^1.1.0"
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+}
