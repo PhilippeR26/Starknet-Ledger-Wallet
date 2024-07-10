@@ -37,6 +37,7 @@ export default function DisplayAccounts() {
           console.log("isAppOpen :", err.message);
           setIsAPPconnectedLocal(false);
           setIsConnectedUSBlocal(false);
+          setAppVersion("TBD")
         }
       
     }
@@ -62,7 +63,7 @@ export default function DisplayAccounts() {
       setIsConnectedUSBlocal(false);
     }
   }
-    , [isConnectedUSBlocal,isAPPconnectedLocal]);
+    , []);
 
   return (
     <Box >
