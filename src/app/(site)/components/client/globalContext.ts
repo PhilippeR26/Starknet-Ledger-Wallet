@@ -1,3 +1,4 @@
+import { NB_ACCOUNTS } from "@/utils/constants";
 import { create } from "zustand";
 
 // 0 = Mainnet
@@ -11,6 +12,8 @@ interface FrontEndState {
     setCurrentAccountID: (currentAccountID: number) => void,
     isLedgerConnectedUSB: boolean,
     setIsLedgerConnectedUSB: (isLedgerConnectedUSB: boolean) => void,
+    isStarknetAppOpen: boolean,
+    setIsStarknetAppOpen: (isStarknetAppOpen: boolean) => void,
     starknetPublicKey:string[],
     setStarknetPublicKey: (starknetPublicKey: string[]) => void,
 
@@ -23,6 +26,8 @@ export const useGlobalContext = create<FrontEndState>()(set => ({
     setCurrentAccountID: (currentAccountID: number) => { set(state => ({ currentAccountID })) },
     isLedgerConnectedUSB: false,
     setIsLedgerConnectedUSB: (isLedgerConnectedUSB: boolean) => { set(state => ({ isLedgerConnectedUSB })) },
-    starknetPublicKey: [],
+    isStarknetAppOpen: false,
+    setIsStarknetAppOpen: (isStarknetAppOpen: boolean) => { set(state => ({ isStarknetAppOpen })) },
+    starknetPublicKey: new Array(NB_ACCOUNTS).fill(""),
     setStarknetPublicKey: (starknetPublicKey: string[]) => { set(state => ({ starknetPublicKey })) },
 }));

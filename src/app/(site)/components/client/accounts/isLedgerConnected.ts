@@ -5,7 +5,7 @@ export async function isLedgerConnected():Promise<boolean>{
     try{
         const transport = await TransportWebHid.create();
         isConnected=true;
-        transport.close();
+        await transport.close();
         console.log("Ledger identified as connected.");
     } catch(err:any) {
         console.log("Ledger presence :",err.message);

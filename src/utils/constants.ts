@@ -21,4 +21,4 @@ export const accountClass = "0x4343194a4a6082192502e132d9e7834b5d9bfc7a0c1dd990e
 
 export const compatibleApiVersions: string[] = ["0.7"];
 
-// export const 
+export const NB_ACCOUNTS = 5;

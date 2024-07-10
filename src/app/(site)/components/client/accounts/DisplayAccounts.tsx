@@ -5,39 +5,52 @@ import { useEffect, useState } from "react";
 import { isLedgerConnected } from "./isLedgerConnected";
 import { useGlobalContext } from "../globalContext";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
+import { LedgerUSBnodeSigner } from "./classLedgerSigner";
 
+const signer0 = new LedgerUSBnodeSigner(0);
 
 export default function DisplayAccounts() {
-  const isLedgerConnectedUSB = useGlobalContext(state => state.isLedgerConnectedUSB);
-  const setIsLedgerConnectedUSB = useGlobalContext(state => state.setIsLedgerConnectedUSB);
+  const [isConnectedUSBlocal, setIsConnectedUSBlocal] = useState<boolean>(false);
+  const [isAPPconnectedLocal, setIsAPPconnectedLocal] = useState<boolean>(false);
+  const [appVersion, setAppVersion] = useState<string>("wait");
+  // const isLedgerConnectedUSB = useGlobalContext(state => state.isLedgerConnectedUSB);
+  // const setIsLedgerConnectedUSB = useGlobalContext(state => state.setIsLedgerConnectedUSB);
   const [timerId, setTimerId] = useState<NodeJS.Timer | undefined>(undefined);
 
-   async function isLedgerConnected():Promise<boolean>{
-    let isConnected:boolean=false;
-    try{
-        const transport = await TransportWebHid.create();
-        isConnected=true;
-        transport.close();
-        console.log("Ledger identified as connected.");
-    } catch(err:any) {
-        console.log("Ledger presence :",err.message);
-    }
-    return isConnected;
-}
 
-  async function LedgerConnected() {
-    if (!isLedgerConnectedUSB){
-    setIsLedgerConnectedUSB(await isLedgerConnected());
+  async function LedgerConnected(isConn:boolean) {
+     console.log("isConnectedUSBlocal =",isConnectedUSBlocal, isConn);
+    if (isConn == false) {
+      // console.log("isLedgerConnectedUSB =",isLedgerConnectedUSB);
+      const isConnected = await isLedgerConnected();
+      console.log({ isConnected });
+      //setIsConnectedUSBlocal(res);
+      setIsConnectedUSBlocal(isConnected);
+      
+    } else{
+        try {
+          const resAppVersion = await signer0.getAppVersion();
+          console.log("version =",{ resAppVersion });
+          setAppVersion(resAppVersion);
+          setIsAPPconnectedLocal(true);
+        } catch (err: any) {
+          console.log("isAppOpen :", err.message);
+          setIsAPPconnectedLocal(false);
+          setIsConnectedUSBlocal(false);
+        }
+      
     }
+
   }
 
-  useEffect( () => {
-    LedgerConnected();
+  useEffect(() => {
+    LedgerConnected(isConnectedUSBlocal);
     const tim = setInterval(() => {
-      LedgerConnected();
+      console.log("aaa-",{isConnectedUSBlocal});
+      LedgerConnected(isConnectedUSBlocal);
       console.log("timerId=", tim);
     }
-      , 3000 //ms
+      , 8000 //ms
     );
     setTimerId(() => tim);
 
@@ -46,14 +59,19 @@ export default function DisplayAccounts() {
     return () => {
       clearInterval(tim);
       console.log("stopTimer", tim)
-      setIsLedgerConnectedUSB(false);
+      setIsConnectedUSBlocal(false);
     }
   }
-    , []);
+    , [isConnectedUSBlocal,isAPPconnectedLocal]);
 
   return (
     <Box >
-      Ledger connected = {isLedgerConnectedUSB?"Yes":"No"}
+      <Center>
+        Ledger connected = {isConnectedUSBlocal ? "Yes" : "No"}
+      </Center>
+      <Center>
+        Starknet APP connected = {isAPPconnectedLocal ? "Yes" : "No"}. Version = {appVersion}
+      </Center>
     </Box>
   )
 }

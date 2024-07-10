@@ -47,22 +47,22 @@ function stringToArrayBuff4(str: string): Uint8Array {
 
 export class LedgerUSBnodeSigner implements SignerInterface {
     readonly accountID: number;
-    readonly applicationName: string;
+    readonly eip2645applicationName: string;
     readonly pathBuffer: Uint8Array;
     private appVersion: string;
     protected pubKey: string;
     protected fullPubKey: string;
 
-    constructor(accountID: number, application: string = "LedgerW") {
+    constructor(accountID: number, eip2645application: string = "LedgerW") {
         assert(accountID >= 0, "Ledger account ID shall not be a negative number.");
         assert(accountID <= MASK_31, "Ledger account ID shall be < 2**31.");
-        assert(!!application, "Ledger application name shall not be empty.")
+        assert(!!eip2645application, "Ledger application name shall not be empty.")
         this.accountID = accountID;
         this.pubKey = "";
         this.fullPubKey = "";
-        this.applicationName = application;
+        this.eip2645applicationName = eip2645application;
         this.appVersion = "";
-        this.pathBuffer = getPathBuffer(this.accountID, this.applicationName);
+        this.pathBuffer = getPathBuffer(this.accountID, this.eip2645applicationName);
     }
 
     private async getPublicKeys() {
