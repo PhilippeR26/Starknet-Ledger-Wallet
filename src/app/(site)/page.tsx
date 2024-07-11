@@ -9,6 +9,7 @@ import ledgerNano from "@/public/Images/LedgerTitle.png";
 import { DisplayConnected } from './components/client/DisplayConnected';
 import LowerBanner from './components/client/LowerBanner';
 import LedgerWallet from './components/client/LedgerWallet';
+import TestClock from './components/client/accounts/TestClock';
 
 export default async function Page() {
 
@@ -29,6 +30,7 @@ export default async function Page() {
 
                 </div>
                 <LedgerWallet></LedgerWallet>
+                {/* <TestClock></TestClock> */}
             </div >
         </ChakraProvider>
     )

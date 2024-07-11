@@ -45,28 +45,40 @@ function stringToArrayBuff4(str: string): Uint8Array {
     return num.hexToBytes(num.toHex(result));
 }
 
+export type LedgerSignerOptionsType = {
+    eip2645application: string,
+    timeout: number
+}
+
 export class LedgerUSBnodeSigner implements SignerInterface {
     readonly accountID: number;
     readonly eip2645applicationName: string;
+    readonly timeout: number;
     readonly pathBuffer: Uint8Array;
     private appVersion: string;
     protected pubKey: string;
     protected fullPubKey: string;
 
-    constructor(accountID: number, eip2645application: string = "LedgerW") {
+    constructor(
+        accountID: number,
+        opt: Partial<LedgerSignerOptionsType> = {}
+    ) {
+        const defaultOptions: LedgerSignerOptionsType = { eip2645application: "LedgerW", timeout: 2000 };
+        const options = { ...defaultOptions, ...opt };
         assert(accountID >= 0, "Ledger account ID shall not be a negative number.");
         assert(accountID <= MASK_31, "Ledger account ID shall be < 2**31.");
-        assert(!!eip2645application, "Ledger application name shall not be empty.")
+        assert(!!options.eip2645application, "Ledger application name shall not be empty.")
         this.accountID = accountID;
         this.pubKey = "";
         this.fullPubKey = "";
-        this.eip2645applicationName = eip2645application;
+        this.eip2645applicationName = options.eip2645application;
+        this.timeout=options.timeout;
         this.appVersion = "";
         this.pathBuffer = getPathBuffer(this.accountID, this.eip2645applicationName);
     }
 
     private async getPublicKeys() {
-        const transport = await TransportWebHid.create();
+        const transport = await TransportWebHid.create(undefined,this.timeout);
         const pathBuff = this.pathBuffer;
         const respGetPublic = Uint8Array.from(await transport.send(Number("0x5a"), 1, 0, 0, Buffer.from(pathBuff)));
         this.pubKey = encode.addHexPrefix(encode.buf2hex(respGetPublic.subarray(1, 33)));
@@ -86,7 +98,7 @@ export class LedgerUSBnodeSigner implements SignerInterface {
 
     public async getAppVersion(): Promise<string> {
         if (!this.appVersion) {
-            const transport = await TransportWebHid.create();
+            const transport = await TransportWebHid.create(undefined,this.timeout);
             const resp = await transport.send(Number("0x5a"), 0, 0, 0);
             this.appVersion = resp[0] + "." + resp[1] + "." + resp[2];
             transport.close();
@@ -192,7 +204,7 @@ export class LedgerUSBnodeSigner implements SignerInterface {
     }
 
     public async signRaw(msgHash: string): Promise<Signature> {
-        const transport = await TransportWebHid.create();
+        const transport = await TransportWebHid.create(undefined,this.timeout);
         encode.addHexPrefix(encode.buf2hex(await transport.send(Number("0x5a"), 2, 0, 0, Buffer.from(this.pathBuffer))));
         const shiftedHash = num.toHex(BigInt(msgHash) << 4n);
         const buff2 = num.hexToBytes(shiftedHash);

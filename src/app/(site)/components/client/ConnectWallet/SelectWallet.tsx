@@ -5,7 +5,7 @@ import { useEffect,useState } from "react";
 import { Button, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, StackDivider, VStack, useDisclosure } from "@chakra-ui/react";
 import { useStoreWallet } from "./walletContext";
 import { useFrontendProvider } from "../provider/providerContext";
-import { compatibleApiVersions, myFrontendProviders } from "@/utils/constants";
+import {  myFrontendProviders } from "@/utils/constants";
 
 type ValidWallet = {
     wallet: WALLET_API.StarknetWindowObject;
