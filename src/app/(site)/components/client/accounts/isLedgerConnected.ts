@@ -3,7 +3,7 @@ import TransportWebHid from "@ledgerhq/hw-transport-webhid";
 export async function isLedgerConnected():Promise<boolean>{
     let isConnected:boolean=false;
     try{
-        const transport = await TransportWebHid.create();
+        const transport = await TransportWebHid.create(undefined,2000);
         isConnected=true;
         await transport.close();
         console.log("Ledger identified as connected.");
