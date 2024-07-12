@@ -20,7 +20,7 @@ export default async function Page() {
                     Use a Ledger Nano wallet with Starknet
                 </p>
                 <Center>
-                    <Image src={ledgerNano } alt='Ledger'  />
+                    <Image src={ledgerNano } alt='Ledger' priority={true} />
                 </Center>
                 <p  className={styles.bgText}>
                     Select a Starknet network

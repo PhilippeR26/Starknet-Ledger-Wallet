@@ -12,7 +12,6 @@ export function formatBalance(qty: bigint, decimals: number): string {
 
 export function formatBalanceShort(qty: bigint, decimals: number,decimalVisible:number): string {
     const balance = String("0").repeat(decimals) + qty.toString();
-    console.log({balance});
     const rightCleaned = balance.slice(-decimals).slice(0,decimalVisible);
     const leftCleaned = BigInt(balance.slice(0, balance.length - decimals)).toString();
     return leftCleaned + "." + rightCleaned;
