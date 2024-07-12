@@ -8,6 +8,8 @@ import TransportWebHid from "@ledgerhq/hw-transport-webhid";
 import { LedgerUSBnodeSigner } from "./classLedgerSigner";
 import { NB_ACCOUNTS } from "@/utils/constants";
 import { sign } from "crypto";
+import { CalcAccountsAddress } from "./calcAccount";
+import { formatAddress, formatBalance, formatBalanceShort } from "@/utils/utils";
 
 
 const signerList: LedgerUSBnodeSigner[] = [];
@@ -43,8 +45,11 @@ export default function DisplayAccounts() {
   const [appVersion, setAppVersion] = useState<string>(defaultAppVersion);
   const starknetPublicKey = useGlobalContext(state => state.starknetPublicKey);
   const setStarknetPublicKey = useGlobalContext(state => state.setStarknetPublicKey);
-  const [seekInProgress,setSeek]=useState<boolean>(false);
-  
+  const [seekInProgress, setSeek] = useState<boolean>(false);
+  const currentNetworkID = useGlobalContext(state => state.currentFrontendNetworkIndex);
+  const starknetAddresses = useGlobalContext(state => state.starknetAddresses);
+  const setStarknetAddresses = useGlobalContext(state => state.setStarknetAddresses);
+
 
 
   async function ledgerConnected() {
@@ -128,9 +133,10 @@ export default function DisplayAccounts() {
     try {
       for (let id: number = 0; id < NB_ACCOUNTS; id++) {
         pkList[id] = await signerList[id].getPubKey();
-        console.log("pk",id,"=",pkList[id]);
+        console.log("pk", id, "=", pkList[id]);
       }
       setStarknetPublicKey(pkList);
+      setStarknetAddresses(CalcAccountsAddress(pkList));
       setSeek(false);
     } catch (err: any) {
       console.log("Read pubK", err.message);
@@ -140,13 +146,17 @@ export default function DisplayAccounts() {
     }
   }
 
-
   useEffect(() => {
-    if (isAPPconnectedLocal && (starknetPublicKey[4]=="")) {
+    if (isAPPconnectedLocal && (starknetPublicKey[4] == "")) {
       getPubK();
     }
-  }
-    , [isAPPconnectedLocal])
+  }, [isAPPconnectedLocal]);
+
+  useEffect(() => {
+    if (isAPPconnectedLocal && (starknetPublicKey[4] == "")) {
+      getPubK();
+    }
+  }, [isAPPconnectedLocal]);
 
   return (
     <Box >
@@ -154,15 +164,28 @@ export default function DisplayAccounts() {
         Ledger connected = {isConnectedUSBlocal ? "Yes" : "No"}
       </Center>
       <Center>
-        Starknet APP connected = {isAPPconnectedLocal ? "Yes" : "No"}. Version = {appVersion}
+        Starknet APP connected = {isAPPconnectedLocal ? "Yes" : "No"}. <br></br> Starknet embedded APP version = {appVersion}
       </Center>
-      {seekInProgress?(<>
+      {seekInProgress ? (<Center>
         <Spinner color="blue" size="sm" ></Spinner>
-      </>
-      ):(<>
-      {starknetPublicKey.map((pk:string,idx:number)=>{return (<>
-        Account {idx} : pubK = {pk} <br></br>
-      </>)})}
+      </Center>
+      ) : (<>
+        <Center>
+          path : m/2645'/starknet'/LedgerW'/0'/n'/0 <br></br>
+        </Center>
+        {/* {starknetPublicKey.map((pk: string, idx: number) => {
+          return (<>
+            Account {idx} : pubK = {pk} <br></br>
+          </>)
+        })} */}
+        {starknetAddresses.map((addr: string, idx: number) => {
+          return (<Center>
+            Account {idx} : addr = {formatAddress(addr)}{" "}
+             {formatBalanceShort(1234567890123456789n,18,4)}Eth  {" "} 
+             {formatBalanceShort(1234567890123456789012n,18,2)}Strk
+             <br></br>
+          </Center>)
+        })}
       </>)}
     </Box>
   )

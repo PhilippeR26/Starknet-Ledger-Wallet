@@ -8,7 +8,7 @@ export async function isLedgerConnected(timeOut:number=2000):Promise<boolean>{
         await transport.close();
         console.log("Ledger identified as connected.");
     } catch(err:any) {
-        console.log("Ledger presence :",err.message);
+        console.log("Err Ledger presence :",err.message);
     }
     return isConnected;
 }

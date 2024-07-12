@@ -16,6 +16,8 @@ interface FrontEndState {
     setIsStarknetAppOpen: (isStarknetAppOpen: boolean) => void,
     starknetPublicKey:string[],
     setStarknetPublicKey: (starknetPublicKey: string[]) => void,
+    starknetAddresses:string[],
+    setStarknetAddresses: (starknetAddresses: string[]) => void,
 
 }
 
@@ -30,4 +32,6 @@ export const useGlobalContext = create<FrontEndState>()(set => ({
     setIsStarknetAppOpen: (isStarknetAppOpen: boolean) => { set(state => ({ isStarknetAppOpen })) },
     starknetPublicKey: new Array(NB_ACCOUNTS).fill(""),
     setStarknetPublicKey: (starknetPublicKey: string[]) => { set(state => ({ starknetPublicKey })) },
+    starknetAddresses: new Array(NB_ACCOUNTS).fill(""),
+    setStarknetAddresses: (starknetAddresses: string[]) => { set(state => ({ starknetAddresses })) },
 }));
