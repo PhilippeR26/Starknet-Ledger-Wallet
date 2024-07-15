@@ -1,41 +1,24 @@
 "use client";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { Box, Button, Center, Link, Spinner, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Center, Radio, RadioGroup, Spinner, Stack, Text, useToast } from "@chakra-ui/react"
 import { useEffect, useRef, useState } from "react";
-import { isLedgerConnected } from "./isLedgerConnected";
 import { useGlobalContext } from "../globalContext";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
-import { LedgerUSBnodeSigner } from "./classLedgerSigner";
-import { NB_ACCOUNTS } from "@/utils/constants";
-import { sign } from "crypto";
+import { NB_ACCOUNTS, addrETH, myFrontendProviders, tokenAddr } from "@/utils/constants";
 import { CalcAccountsAddress, signerList } from "./calcAccount";
 import { formatAddress, formatBalance, formatBalanceShort } from "@/utils/utils";
+import type { DeployAccountResp } from "@/type/types";
+import { deployAccountOpenzeppelin14 } from "./deployOZ";
+import GetBalance from "../Contract/GetBalance";
+import { erc20Abi } from "@/app/(site)/contracts/abis/ERC20abi";
+import { Contract } from "starknet";
+import GetBalanceSimple from "../Contract/GetBalanceSimple";
 
 
-// type reducerConnectType={type:string,payload:string}
-// const reducerConnect = async (isConnected: boolean, action: string) => {
-//   switch (action) {
-//     case "Try": {
-//       let tryConnect:boolean=isConnected;
-//       if (isConnected == false) {
-//         console.log("reducerConnect before =", isConnected);
-//         tryConnect = await isLedgerConnected();
-//         console.log("reducerConnect after =", tryConnect);
-//       }
-//       return tryConnect;
-//     }
-//     default:
-//       return isConnected;
-//   }
-// }
 
 
 export default function DisplayAccounts() {
   const defaultAppVersion = "---";
 
-  //const [status0, setStatus0] = useState<boolean>(false);
-  //const [hasConnectionFailed, setConnectionFailed] = useState<boolean>(false);
-  //const connectedRef = useRef(hasConnectionFailed);
   const [isAPPconnectedLocal, setIsAPPconnectedLocal] = useState<boolean>(false);
   const appOpenedRef = useRef(isAPPconnectedLocal);
   const [appVersion, setAppVersion] = useState<string>(defaultAppVersion);
@@ -46,20 +29,14 @@ export default function DisplayAccounts() {
   const currentNetworkID = useGlobalContext(state => state.currentFrontendNetworkIndex);
   const starknetAddresses = useGlobalContext(state => state.starknetAddresses);
   const setStarknetAddresses = useGlobalContext(state => state.setStarknetAddresses);
+  const setCurrentAccountID = useGlobalContext(state => state.setCurrentAccountID);
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [isDeployed, setIsDeployed] = useState<boolean[]>(new Array(5).fill(false));
+  const [isDeployProcessing, SetIsDeployProcessing] = useState<boolean>(false);
+  const currentFrontendNetworkIndex = useGlobalContext(state => state.currentFrontendNetworkIndex);
+const [deployInProgress,setDeployInProgress]=useState<number>(0);
+const toast = useToast();
 
-
-
-  // async function ledgerConnected() {
-  //   console.log("connectedRef.current =", connectedRef.current);
-  //   if (connectedRef.current == false) {
-  //     // console.log("isLedgerConnectedUSB =",isLedgerConnectedUSB);
-  //     const isConnected = await isLedgerConnected();
-  //     console.log({ isConnected });
-  //     //setIsConnectedUSBlocal(res);
-  //     connectedRef.current = isConnected
-  //     setConnectionFailed(isConnected);
-  //   }
-  // }
 
   async function appConnected() {
     try {
@@ -78,36 +55,25 @@ export default function DisplayAccounts() {
       setIsAPPconnectedLocal(false);
     }
   }
-  // }
 
-  // useEffect(() => {
-  //   connectedRef.current = isConnectedUSBlocal;
-  //   appOpenedRef.current = isAPPconnectedLocal;
-  // }); //updated at each refresh
-
-  // useEffect(() => {
-  //   ledgerConnected();
-  //   const tim = setInterval(() => {
-  //     console.log("aaa-", connectedRef.current);
-  //     ledgerConnected();
-  //     console.log("timerId=", tim);
-  //   }
-  //     , 5000 //ms
-  //   );
-  //   console.log("startTimer", tim);
-
-  //   return () => {
-  //     clearInterval(tim);
-  //     console.log("stopTimer", tim)
-  //     setIsConnectedUSBlocal(false);
-  //   }
-  // }
-  //   , []);
-
-  // useEffect(() => {
-  //   appConnected();
-  // }
-  //   , []);
+  async function AreDeployed(addresses:string[]) {
+    const res = await Promise.all(
+      addresses.map(async (addr: string, idx: number): Promise<boolean> => {
+        try {
+          await myFrontendProviders[currentNetworkID].getClassAt(addr);
+          console.log("isDeployed",idx,"true",addr);
+          return true;
+        } catch {
+          console.log("isDeployed",idx,"false",addr);
+          return false
+        }
+      }
+      )
+    );
+    console.log("are deployed",res);
+    setIsDeployed(res);
+  
+  }
 
   async function getPubK() {
     let pkList: string[] = [];
@@ -118,38 +84,76 @@ export default function DisplayAccounts() {
         console.log("pk", id, "=", pkList[id]);
       }
       setStarknetPublicKey(pkList);
-      setStarknetAddresses(CalcAccountsAddress(pkList));
+      const addresses=CalcAccountsAddress(pkList);
+      setStarknetAddresses(addresses);
       setSeek(false);
+      await AreDeployed(addresses);
+
     } catch (err: any) {
       console.log("Error read pubK", err.message);
       setIsAPPconnectedLocal(false);
-      //setConnectionFailed(false);
       setSeek(false);
     }
   }
 
-  async function go(){
-    setGo(true); 
-    await appConnected(); 
+  async function go() {
+    setGo(true);
+    await appConnected();
     await getPubK()
   }
 
-  // useEffect(() => {
-  //   if (isAPPconnectedLocal && (starknetPublicKey[4] == "")) {
-  //     getPubK();
-  //   }
-  // }, [isAPPconnectedLocal]);
+  async function deployAccount(id: number) {
+    if (currentFrontendNetworkIndex == 2) {
+      console.log("deploy start=", id);
+      SetIsDeployProcessing(true);
+      setDeployInProgress(1);
+      const myProvider = myFrontendProviders[2];
+      const addr = starknetAddresses[id!];
+      const resp: DeployAccountResp = await deployAccountOpenzeppelin14(myProvider, signerList[id]);
+      setIsDeployed(isDeployed.map(
+        (val: boolean, idx: number) => {
+          if (idx == id) { return true } else { return val }
+        }
+      ));
+      console.log("deploy account ended.");
+      setDeployInProgress(2);
+      SetIsDeployProcessing(false);
+    }
+  }
 
+  useEffect(() => {
+    if (selectedAccount !== "") setCurrentAccountID(Number(selectedAccount));
+  }
+    , [selectedAccount]
+  );
 
+  useEffect(() => {
+    if (deployInProgress == 1) {
+        toast({
+            title: "Deployment in progress...",
+            description: "Sign on Ledger and wait.",
+            duration: 15_000,
+            isClosable: true,
+            position: "bottom-right"
+        })
+    }
+    else if (deployInProgress == 2) {
+        toast({
+            title: "Account deployed...",
+            duration: 10_000,
+            isClosable: true,
+            position: "bottom-right"
+        })
+    }
+}, [deployInProgress]);
+
+  
   return (
     <Box mt={2}>
-      {/* <Center>
-        Ledger connected = {hasConnectionFailed ? "Yes" : "No"}
-      </Center> */}
       <Center>
-        <Button bg={"deepskyblue"} 
-        onClick={() => {go()  }}
-        mb={2}
+        <Button bg={"blue.200"}
+          onClick={() => { go() }}
+          mb={2}
         >Go!</Button>
       </Center>
 
@@ -171,24 +175,61 @@ export default function DisplayAccounts() {
         <Center>
           path : m/2645'/starknet'/LedgerW'/0'/n'/0 <br></br>
         </Center>
-        {/* {starknetPublicKey.map((pk: string, idx: number) => {
-          return (<>
-            Account {idx} : pubK = {pk} <br></br>
-          </>)
-        })} */}
-        <Stack
-          spacing={5}
-          direction="column"
-          mt={4}>
-          {starknetAddresses.map((addr: string, idx: number) => {
-            return (<Center key={"listAddr" + idx.toString()}>
-              Account {idx} : addr = {formatAddress(addr)}{" "}
-              {formatBalanceShort(1234567890123456789n, 18, 4)}Eth  {" "}
-              {formatBalanceShort(1234567890123456789012n, 18, 2)}Strk
-              <br></br>
-            </Center>)
-          })}
-        </Stack>
+
+        <Center>
+          <RadioGroup
+            mt={1}
+            borderColor={"black"}
+            borderWidth={2}
+            borderRadius={6}
+            defaultValue='1'
+            p={2}
+            onChange={(id:string)=>{if (isDeployed[Number(id)])setSelectedAccount(id)}}
+            value={selectedAccount}>
+            <Stack
+              spacing={1}
+              direction="column"
+            >
+              {starknetAddresses.map((addr: string, idx: number) => {
+                return (<Radio
+                  colorScheme='pink'
+                  value={idx.toString()}
+                  key={"listAcc" + idx.toString()}
+                  disabled={isDeployed[idx]?false:true}
+                >
+                  Account {idx} : {formatAddress(addr)}{" "}
+                  {!isDeployed[idx] ? (
+                    <>
+                      <Button
+                        colorScheme='blue'
+                        onClick={() => { deployAccount(idx) }}
+                      >Deploy</Button>
+                      {isDeployProcessing && (
+                        <>
+                        <Spinner color="blue" size="sm" ></Spinner>
+                        Sign on Ledger
+                      </>)}
+                    </>
+                  ) : (
+                    <>
+                      <GetBalanceSimple
+                        token={tokenAddr.ETH}
+                        accountAddr={starknetAddresses[idx]}>
+                      </GetBalanceSimple> {" "}
+                      <GetBalanceSimple
+                        token={tokenAddr.STRK}
+                        accountAddr={starknetAddresses[idx]}>
+                      </GetBalanceSimple>
+
+                    </>
+                  )
+                  }
+                  <br></br>
+                </Radio>)
+              })}
+            </Stack>
+          </RadioGroup>
+        </Center>
       </>)}
     </Box>
   )

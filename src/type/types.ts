@@ -1,3 +1,5 @@
+import type { Account, BigNumberish } from "starknet"
+
 export interface WatchAssetParameters {
     type: "ERC20" // The asset's interface, e.g. 'ERC20'
     options: {
@@ -28,6 +30,14 @@ export interface AddStarknetChainParameters {
         decimals: number
     } // Currently ignored.
     iconUrls?: string[] // Currently ignored.
+}
+
+export type DeployAccountResp = {
+    account: Account,
+    address: BigNumberish,
+    classH: BigNumberish,
+    privateK: BigNumberish,
+    publicK: BigNumberish,
 }
 
 

@@ -17,14 +17,11 @@ export default async function Page() {
         <ChakraProvider>
             <div>
                 <p className={styles.bgText}>
-                    Use a Ledger Nano wallet with Starknet
+                    Use a Ledger Nano wallet with Starknet.js
                 </p>
                 <Center>
                     <Image src={ledgerNano } alt='Ledger' priority={true} />
                 </Center>
-                <p  className={styles.bgText}>
-                    Select a Starknet network
-                </p>
                 <div>
                     {/* <DisplayConnected></DisplayConnected> */}
 
