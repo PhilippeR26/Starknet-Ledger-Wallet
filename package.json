@@ -1,14 +1,18 @@
 {
-  "name": "cairo1-js",
+  "name": "starknet-ledger-wallet",
   "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "static": "next build && next export"
   },
   "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/ios": "^6.1.0",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
@@ -21,21 +25,19 @@
     "@types/react-dom": "18.3.0",
     "dotenv": "^16.4.5",
     "framer-motion": "^11.2.14",
-    "material-react-toastify": "^2.0.1",
     "next": "^14.2.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.52.1",
     "react-qr-code": "^2.0.15",
-    "server-only": "^0.0.1",
     "sharp": "^0.33.4",
     "starknet": "^6.11.0",
     "starknet-devnet": "^0.0.5",
-    "swr": "^2.2.5",
     "typescript": "^5.5.3",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.1.0",
     "encoding": "^0.1.13",
     "simple-zustand-devtools": "^1.1.0"
   },

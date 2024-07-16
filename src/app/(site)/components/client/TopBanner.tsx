@@ -5,13 +5,13 @@ import { Box, Link } from "@chakra-ui/react"
 
 // const tt : ert.RPC.RPCSPEC07.ETransactionVersion2 = types.RPC.RPCSPEC07.ETransactionVersion2.F0;
 
-export default function LowerBanner() {
+export default function TopBanner() {
     return(
         <Box
             position={"fixed"}
-            bottom="0%"
+            top="0%"
             width="100%"
-            marginTop="1"
+            marginBottom="1"
             borderColor="black"
             borderWidth="0px"
             borderRadius="0"

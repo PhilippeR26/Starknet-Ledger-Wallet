@@ -222,19 +222,19 @@ export class LedgerUSBnodeSigner implements SignerInterface {
 
 function getPathBuffer(accountId: number, applicationName: string): Uint8Array {
     const path0buff = new Uint8Array([128, 0, 10, 85]); // "0x80000A55" EIP2645;
-    console.log("path0buff =", path0buff);
+    //console.log("path0buff =", path0buff);
     const path1buff = new Uint8Array([71, 65, 233, 201]); // "starknet"
-    console.log("path1buff =", path1buff);
+    //console.log("path1buff =", path1buff);
     const path2buff = applicationName == "LedgerW" ? new Uint8Array([43, 206, 231, 219]) : stringToArrayBuff4(applicationName);
-    console.log("path2buff =", path2buff);
+    //console.log("path2buff =", path2buff);
     const path3buff = new Uint8Array([0, 0, 0, 0]);
-    console.log("path3buff =", path3buff);
+    //console.log("path3buff =", path3buff);
     const hex = num.toHex(accountId);
     const padded = encode.addHexPrefix(encode.removeHexPrefix(hex).padStart(8, '0'));
     const path4buff = num.hexToBytes(padded);;
-    console.log("path4buff =", path4buff);
+    //console.log("path4buff =", path4buff);
     const path5buff = new Uint8Array([0, 0, 0, 0]);
-    console.log("path5buff =", path5buff);
+    //console.log("path5buff =", path5buff);
     const pathBuff = concatenateArrayBuffer([path0buff, path1buff, path2buff, path3buff, path4buff, path5buff]);
     return pathBuff;
 }

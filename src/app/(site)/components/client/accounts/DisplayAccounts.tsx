@@ -12,13 +12,13 @@ import GetBalance from "../Contract/GetBalance";
 import { erc20Abi } from "@/app/(site)/contracts/abis/ERC20abi";
 import { Contract } from "starknet";
 import GetBalanceSimple from "../Contract/GetBalanceSimple";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 
 
 
 export default function DisplayAccounts() {
   const defaultAppVersion = "---";
-
   const [isAPPconnectedLocal, setIsAPPconnectedLocal] = useState<boolean>(false);
   const appOpenedRef = useRef(isAPPconnectedLocal);
   const [appVersion, setAppVersion] = useState<string>(defaultAppVersion);
@@ -32,10 +32,11 @@ export default function DisplayAccounts() {
   const setCurrentAccountID = useGlobalContext(state => state.setCurrentAccountID);
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [isDeployed, setIsDeployed] = useState<boolean[]>(new Array(5).fill(false));
-  const [isDeployProcessing, SetIsDeployProcessing] = useState<boolean>(false);
+  const [isDeployProcessing, SetIsDeployProcessing] = useState<number>(1000);
   const currentFrontendNetworkIndex = useGlobalContext(state => state.currentFrontendNetworkIndex);
-const [deployInProgress,setDeployInProgress]=useState<number>(0);
-const toast = useToast();
+  const [deployInProgress, setDeployInProgress] = useState<number>(0);
+  const toast = useToast();
+  const scrollRef = useRef<null | HTMLDivElement>(null);
 
 
   async function appConnected() {
@@ -56,23 +57,23 @@ const toast = useToast();
     }
   }
 
-  async function AreDeployed(addresses:string[]) {
+  async function AreDeployed(addresses: string[]) {
     const res = await Promise.all(
       addresses.map(async (addr: string, idx: number): Promise<boolean> => {
         try {
           await myFrontendProviders[currentNetworkID].getClassAt(addr);
-          console.log("isDeployed",idx,"true",addr);
+          console.log("isDeployed", idx, "true", addr);
           return true;
         } catch {
-          console.log("isDeployed",idx,"false",addr);
+          console.log("isDeployed", idx, "false", addr);
           return false
         }
       }
       )
     );
-    console.log("are deployed",res);
+    console.log("are deployed", res);
     setIsDeployed(res);
-  
+
   }
 
   async function getPubK() {
@@ -81,10 +82,10 @@ const toast = useToast();
     try {
       for (let id: number = 0; id < NB_ACCOUNTS; id++) {
         pkList[id] = await signerList[id].getPubKey();
-        console.log("pk", id, "=", pkList[id]);
+        console.log("pubK", id, "=", pkList[id]);
       }
       setStarknetPublicKey(pkList);
-      const addresses=CalcAccountsAddress(pkList);
+      const addresses = CalcAccountsAddress(pkList);
       setStarknetAddresses(addresses);
       setSeek(false);
       await AreDeployed(addresses);
@@ -105,7 +106,7 @@ const toast = useToast();
   async function deployAccount(id: number) {
     if (currentFrontendNetworkIndex == 2) {
       console.log("deploy start=", id);
-      SetIsDeployProcessing(true);
+      SetIsDeployProcessing(id);
       setDeployInProgress(1);
       const myProvider = myFrontendProviders[2];
       const addr = starknetAddresses[id!];
@@ -117,7 +118,7 @@ const toast = useToast();
       ));
       console.log("deploy account ended.");
       setDeployInProgress(2);
-      SetIsDeployProcessing(false);
+      SetIsDeployProcessing(1000);
     }
   }
 
@@ -129,27 +130,41 @@ const toast = useToast();
 
   useEffect(() => {
     if (deployInProgress == 1) {
-        toast({
-            title: "Deployment in progress...",
-            description: "Sign on Ledger and wait.",
-            duration: 15_000,
-            isClosable: true,
-            position: "bottom-right"
-        })
+      toast({
+        title: "Deployment in progress...",
+        description: "Sign on Ledger and wait.",
+        duration: 15_000,
+        isClosable: true,
+        position: "bottom-right"
+      })
     }
     else if (deployInProgress == 2) {
-        toast({
-            title: "Account deployed...",
-            duration: 10_000,
-            isClosable: true,
-            position: "bottom-right"
+      toast({
+        title: "Account deployed...",
+        duration: 10_000,
+        isClosable: true,
+        position: "bottom-right"
+      })
+    }
+  }, [deployInProgress]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView(
+        {
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'nearest'
         })
     }
-}, [deployInProgress]);
+  },
+    [seekInProgress])
 
-  
   return (
-    <Box mt={2}>
+    <Box 
+    mt={2}
+    ref={scrollRef}
+    >
       <Center>
         <Button bg={"blue.200"}
           onClick={() => { go() }}
@@ -184,7 +199,7 @@ const toast = useToast();
             borderRadius={6}
             defaultValue='1'
             p={2}
-            onChange={(id:string)=>{if (isDeployed[Number(id)])setSelectedAccount(id)}}
+            onChange={(id: string) => { if (isDeployed[Number(id)]) setSelectedAccount(id) }}
             value={selectedAccount}>
             <Stack
               spacing={1}
@@ -195,20 +210,20 @@ const toast = useToast();
                   colorScheme='pink'
                   value={idx.toString()}
                   key={"listAcc" + idx.toString()}
-                  disabled={isDeployed[idx]?false:true}
+                  disabled={isDeployed[idx] ? false : true}
                 >
-                  Account {idx} : {formatAddress(addr)}{" "}
+                  Account {idx} : {formatAddress(addr)}<ExternalLinkIcon mx='2px'></ExternalLinkIcon>{" "}
                   {!isDeployed[idx] ? (
                     <>
                       <Button
                         colorScheme='blue'
                         onClick={() => { deployAccount(idx) }}
                       >Deploy</Button>
-                      {isDeployProcessing && (
+                      {isDeployProcessing == idx && (
                         <>
-                        <Spinner color="blue" size="sm" ></Spinner>
-                        Sign on Ledger
-                      </>)}
+                          <Spinner color="blue" size="sm" ></Spinner>
+                          Sign on Ledger
+                        </>)}
                     </>
                   ) : (
                     <>

@@ -6,10 +6,10 @@ import { Center } from '@chakra-ui/react';
 import { ChakraProvider } from '@chakra-ui/react'
 
 import ledgerNano from "@/public/Images/LedgerTitle.png";
-import { DisplayConnected } from './components/client/DisplayConnected';
 import LowerBanner from './components/client/LowerBanner';
 import LedgerWallet from './components/client/LedgerWallet';
 import TestClock from './components/client/accounts/TestClock';
+import TopBanner from './components/client/TopBanner';
 
 export default async function Page() {
 
@@ -17,6 +17,7 @@ export default async function Page() {
         <ChakraProvider>
             <div>
                 <p className={styles.bgText}>
+                    <br></br>
                     Use a Ledger Nano wallet with Starknet.js
                 </p>
                 <Center>
@@ -28,6 +29,7 @@ export default async function Page() {
                 </div>
                 <LedgerWallet></LedgerWallet>
                 {/* <TestClock></TestClock> */}
+                <TopBanner></TopBanner>
             </div >
         </ChakraProvider>
     )
