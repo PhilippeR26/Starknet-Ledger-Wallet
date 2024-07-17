@@ -20,7 +20,9 @@
 `npm run dev` then open http://localhost:3000/
 
 ### Deployed DAPP
-https://starknet-ledget-wallet.vercel.app/
+https://starknet-ledger-wallet.vercel.app/
+
+NanoX bluetooth : experimental : https://starknet-ledget-wallet-git-nanox-philipper26s-projects.vercel.app/
 
 ## Browsers :
 
@@ -52,4 +54,4 @@ This version of DAPP requests to connect the Ledger Nano to an USB connector of 
 
 # Network :
 
-Today, the DAPP is only working with the [devnet-rs](https://github.com/0xSpaceShard/starknet-devnet-rs) network : 
+Today, the DAPP is only working with the [devnet-rs](https://github.com/0xSpaceShard/starknet-devnet-rs) network. 
