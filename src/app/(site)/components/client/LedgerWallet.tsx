@@ -1,7 +1,5 @@
 "use client";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { Box, Center, Link, Text } from "@chakra-ui/react"
-import { constants, types, type types as ert } from "starknet";
+import { Box, Text } from "@chakra-ui/react"
 import SelectNetwork from "./SelectNetwork";
 import DisplayAccounts from "./accounts/DisplayAccounts";
 import Transfer from "./accounts/Transfer";
@@ -15,8 +13,8 @@ export default function LedgerWallet() {
       <Box bg={"steelblue"} pb={2}>
         <SelectNetwork></SelectNetwork>
         <Text align={"center"}>
-          Connect your Ledger NanoS+ or NanoX<br></br>
-          to an USB connector <br></br>
+          Connect your Ledger NanoX<br></br>
+          with BlueTooth <br></br>
           and select the Starknet App.<br></br>
           Then click on 'Go'
         </Text>

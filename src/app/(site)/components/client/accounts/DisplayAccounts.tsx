@@ -2,7 +2,9 @@
 import { Box, Button, Center, Radio, RadioGroup, Spinner, Stack, Text, useToast } from "@chakra-ui/react"
 import { useEffect, useRef, useState } from "react";
 import { useGlobalContext } from "../globalContext";
-import TransportWebHid from "@ledgerhq/hw-transport-webhid";
+// import TransportSource from "@ledgerhq/hw-transport-webhid";
+import TransportSource from "@ledgerhq/hw-transport-web-ble";
+
 import { NB_ACCOUNTS, addrETH, myFrontendProviders, tokenAddr } from "@/utils/constants";
 import { CalcAccountsAddress, signerList } from "./calcAccount";
 import { formatAddress, formatBalance, formatBalanceShort } from "@/utils/utils";
@@ -43,7 +45,7 @@ export default function DisplayAccounts() {
     try {
       setSeek(true);
       console.log("try read version");
-      const transport = await TransportWebHid.create(undefined, 30_000); // 30s timeout
+      const transport = await TransportSource.create(undefined, 30_000); // 30s timeout
       const resp = await transport.send(Number("0x5a"), 0, 0, 0);
       const appVersion = resp[0] + "." + resp[1] + "." + resp[2];
       transport.close();

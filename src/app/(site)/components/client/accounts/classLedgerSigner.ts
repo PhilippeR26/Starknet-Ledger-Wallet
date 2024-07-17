@@ -1,6 +1,6 @@
 import { CallData, Signer, SignerInterface, ec, encode, hash, num, shortString, stark, transaction, typedData, validateAndParseAddress, type Call, type DeclareSignerDetails, type DeployAccountSignerDetails, type InvocationsSignerDetails, type Signature, type TypedData, type V2DeclareSignerDetails, type V2DeployAccountSignerDetails, type V2InvocationsSignerDetails, type V3DeclareSignerDetails, type V3DeployAccountSignerDetails, type V3InvocationsSignerDetails, type WeierstrassSignatureType, } from "starknet"
-import TransportWebHid from "@ledgerhq/hw-transport-webhid";
-//import BluetoothTransport from "@ledgerhq/hw-transport-web-ble";
+// import TransportSource from "@ledgerhq/hw-transport-webhid";
+import TransportSource from "@ledgerhq/hw-transport-web-ble";
 import { sha256 } from '@noble/hashes/sha256';
 import { ETransactionVersion2, ETransactionVersion3 } from "starknet-types-07";
 
@@ -77,7 +77,7 @@ export class LedgerUSBnodeSigner implements SignerInterface {
     }
 
     private async getPublicKeys() {
-        const transport = await TransportWebHid.create(undefined, this.timeout);
+        const transport = await TransportSource.create(undefined, this.timeout);
         const pathBuff = this.pathBuffer;
         const respGetPublic = Uint8Array.from(await transport.send(Number("0x5a"), 1, 0, 0, Buffer.from(pathBuff)));
         this.pubKey = encode.addHexPrefix(encode.buf2hex(respGetPublic.subarray(1, 33)));
@@ -97,7 +97,7 @@ export class LedgerUSBnodeSigner implements SignerInterface {
 
     public async getAppVersion(): Promise<string> {
         if (!this.appVersion) {
-            const transport = await TransportWebHid.create(undefined, this.timeout);
+            const transport = await TransportSource.create(undefined, this.timeout);
             const resp = await transport.send(Number("0x5a"), 0, 0, 0);
             this.appVersion = resp[0] + "." + resp[1] + "." + resp[2];
             transport.close();
@@ -204,7 +204,7 @@ export class LedgerUSBnodeSigner implements SignerInterface {
     }
 
     public async signRaw(msgHash: string): Promise<Signature> {
-        const transport = await TransportWebHid.create(undefined, this.timeout);
+        const transport = await TransportSource.create(undefined, this.timeout);
         encode.addHexPrefix(encode.buf2hex(await transport.send(Number("0x5a"), 2, 0, 0, Buffer.from(this.pathBuffer))));
         const shiftedHash = num.toHex(BigInt(msgHash) << 4n);
         const buff2 = num.hexToBytes(shiftedHash);
