@@ -22,7 +22,7 @@
 ### Deployed DAPP
 https://starknet-ledger-wallet.vercel.app/
 
-NanoX bluetooth : experimental : https://starknet-ledget-wallet-git-nanox-philipper26s-projects.vercel.app/
+NanoX bluetooth : experimental : https://starknet-ledger-wallet-git-nanox-philipper26s-projects.vercel.app/
 
 ## Browsers :
 

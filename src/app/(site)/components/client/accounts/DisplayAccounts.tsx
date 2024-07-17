@@ -7,7 +7,7 @@ import TransportSource from "@ledgerhq/hw-transport-web-ble";
 
 import { NB_ACCOUNTS, addrETH, myFrontendProviders, tokenAddr } from "@/utils/constants";
 import { CalcAccountsAddress, signerList } from "./calcAccount";
-import { formatAddress, formatBalance, formatBalanceShort } from "@/utils/utils";
+import { formatAddress, formatBalance, formatBalanceShort, wait } from "@/utils/utils";
 import type { DeployAccountResp } from "@/type/types";
 import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import GetBalance from "../Contract/GetBalance";
@@ -45,7 +45,8 @@ export default function DisplayAccounts() {
     try {
       setSeek(true);
       console.log("try read version");
-      const transport = await TransportSource.create(undefined, 30_000); // 30s timeout
+      const transport = await TransportSource.create(undefined,30_000); // 30s timeout
+      console.log("transport loaded");
       const resp = await transport.send(Number("0x5a"), 0, 0, 0);
       const appVersion = resp[0] + "." + resp[1] + "." + resp[2];
       transport.close();

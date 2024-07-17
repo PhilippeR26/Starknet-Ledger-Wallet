@@ -16,3 +16,9 @@ export function formatBalanceShort(qty: bigint, decimals: number,decimalVisible:
     const leftCleaned = BigInt(balance.slice(0, balance.length - decimals)).toString();
     return leftCleaned + "." + rightCleaned;
 }
+
+export function wait(delay: number) { // ms
+    return new Promise((res) => {
+        setTimeout(res, delay);
+    });
+}
