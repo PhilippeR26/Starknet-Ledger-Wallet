@@ -22,6 +22,9 @@
 ### Deployed DAPP
 https://starknet-ledget-wallet.vercel.app/
 
+NanoX bluetooth : experimental : https://starknet-ledger-wallet-git-nanox-philipper26s-projects.vercel.app/
+(do not work on linux mint)
+
 ## Browsers :
 
 | Browser | compatible |
@@ -52,4 +55,4 @@ This version of DAPP requests to connect the Ledger Nano to an USB connector of 
 
 # Network :
 
-Today, the DAPP is only working with the [devnet-rs](https://github.com/0xSpaceShard/starknet-devnet-rs) network : 
+Today, the DAPP is only working with the [devnet-rs](https://github.com/0xSpaceShard/starknet-devnet-rs) network. 
