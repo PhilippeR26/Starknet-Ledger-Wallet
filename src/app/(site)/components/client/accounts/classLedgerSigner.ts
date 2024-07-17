@@ -114,6 +114,7 @@ export class LedgerUSBnodeSigner implements SignerInterface {
         transactions: Call[],
         details: InvocationsSignerDetails
     ): Promise<Signature> {
+        console.log("details",details);
         const compiledCalldata = transaction.getExecuteCalldata(transactions, details.cairoVersion);
         let msgHash;
 

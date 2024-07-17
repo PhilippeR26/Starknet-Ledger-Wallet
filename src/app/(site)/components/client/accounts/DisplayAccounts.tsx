@@ -10,7 +10,7 @@ import type { DeployAccountResp } from "@/type/types";
 import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import GetBalance from "../Contract/GetBalance";
 import { erc20Abi } from "@/app/(site)/contracts/abis/ERC20abi";
-import { Contract } from "starknet";
+import { Contract, validateAndParseAddress } from "starknet";
 import GetBalanceSimple from "../Contract/GetBalanceSimple";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
@@ -212,7 +212,10 @@ export default function DisplayAccounts() {
                   key={"listAcc" + idx.toString()}
                   disabled={isDeployed[idx] ? false : true}
                 >
-                  Account {idx} : {formatAddress(addr)}<ExternalLinkIcon mx='2px'></ExternalLinkIcon>{" "}
+                  Account {idx} : {formatAddress(addr)}<ExternalLinkIcon 
+                  mx='2px'
+                  onClick={() => {navigator.clipboard.writeText(validateAndParseAddress(addr))}}
+                  ></ExternalLinkIcon>{" "}
                   {!isDeployed[idx] ? (
                     <>
                       <Button

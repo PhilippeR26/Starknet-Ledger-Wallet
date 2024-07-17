@@ -1,18 +1,19 @@
 "use client";
 
-import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel, Input, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel, Input, Spinner, Text, Textarea } from "@chakra-ui/react";
 import { useGlobalContext } from "../globalContext";
 import QRCode from "react-qr-code";
 import { useForm } from "react-hook-form";
-import { CallData, num, json, Account, Contract } from "starknet";
+import { CallData, num, json, Account, Contract, type Call, type GetTransactionReceiptResponse, type RejectedTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress } from "starknet";
 import { useEffect, useRef, useState } from "react";
 import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import type { DeployAccountResp } from "@/type/types";
 import { addrETH, myFrontendProviders } from "@/utils/constants";
 import { DevnetProvider } from "starknet-devnet";
-import { signerList } from "./calcAccount";
+import { calcHashTransaction, signerList } from "./calcAccount";
 import { erc20Abi } from "../../../contracts//abis/ERC20abi";
 import { formatAddress } from "@/utils/utils";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 interface FormValues {
   targetAddress: string,
   amount: string
@@ -28,37 +29,68 @@ export default function Transfer() {
   const [isBuild, setIsBuild] = useState<boolean>(false);
   const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
   const scrollRef = useRef<null | HTMLDivElement>(null);
+  const [hash, setHash] = useState<string>("");
+  const [txH, setTxH] = useState<string>("");
+  const [txR, setTxR] = useState<GetTransactionReceiptResponse | undefined>(undefined);
 
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting, isValid }
   } = useForm<FormValues>();
 
+  // Submit transfer button
   async function onSubmitResponse(values: FormValues) {
     setDestAddress(values.targetAddress);
     setAmount(values.amount);
     setIsBuild(true);
+    setHash(await calcHash(values.targetAddress, values.amount));
+
   }
 
-  async function transferETH() {
-    const myProvider = myFrontendProviders[2];
-    const myAccount = new Account(myProvider, starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
+  async function buildCall(addr: string, amountETH: string): Promise<Call> {
+    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
     const ethContract = new Contract(erc20Abi, addrETH, myAccount);
-    const devnetProvider = new DevnetProvider();
-    const acc = await devnetProvider.getPredeployedAccounts();
+
+    let decimal: string = "";
+    if (amountETH.includes(".")) { decimal = "." };
+    if (amountETH.includes(",")) { decimal = "," };
+    if (decimal == "") {
+      setIsBuild(false);
+      throw new Error("Wrong format of amount.");
+    }
+    const decimalPos = amountETH.indexOf(decimal);
+    const left = amountETH.slice(0, decimalPos); console.log({ left });
+    const right = amountETH.slice(decimalPos + 1); console.log({ right });
+    const posValue = right.search(/[1-9]/);; console.log({ posValue });
+    let rightValue: bigint = 0n;
+    if (posValue != -1) { rightValue = BigInt(right) * 10n ** (17n - BigInt(posValue)) }
+    const qty = BigInt(left) * 10n ** 18n + rightValue;
+
     const myCall = ethContract.populate("transfer", {
-      recipient: acc[0].address,
-      amount: 1n * 10n ** 14n
+      recipient: addr,
+      amount: qty
     });
+    console.log("Call=", myCall);
+    return myCall
+  }
+
+  async function transferETH(addr: string, amountETH: string) {
+    setIsTxApproved(true);
+    const myProvider = myFrontendProviders[2];
+    const myCall = await buildCall(addr, amountETH);
     console.log("transfer to sign");
+    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
     const resp = await myAccount.execute(myCall);
     console.log("transferred!");
-    const txR = await myProvider.waitForTransaction(resp.transaction_hash);
-    console.log(txR.value);
+    setTxH(resp.transaction_hash);
+    const txReceipt = await myProvider.waitForTransaction(resp.transaction_hash);
+    setTxR(txReceipt);
+    console.log(txReceipt.value);
+
   }
 
-  useEffect(() => {
+  function scroll() {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView(
         {
@@ -67,20 +99,40 @@ export default function Transfer() {
           inline: 'nearest'
         })
     }
-  },
-    [currentAccountID,isBuild, isTxApproved])
+  }
 
-    useEffect(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollIntoView(
-          {
-            behavior: 'smooth',
-            block: 'end',
-            inline: 'nearest'
-          })
-      }
-    },
-      [])
+  async function calcHash(addr: string, amountETH: string): Promise<string> {
+    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
+    return calcHashTransaction(await buildCall(addr
+      , amountETH
+    ), myAccount);
+  }
+
+  function recoverError(txR: GetTransactionReceiptResponse): string {
+    let resp: string = "";
+    txR.match({
+
+      rejected: (txR: RejectedTransactionReceiptResponse) => {
+        resp = txR.status + " " + txR.transaction_failure_reason
+      },
+      reverted: (txR: RevertedTransactionReceiptResponse) => {
+        resp = txR.execution_status + " " + txR.revert_reason
+      },
+      _: () => { resp = "" },
+    })
+    return resp;
+  }
+
+
+  useEffect(() => {
+    scroll();
+  },
+    [currentAccountID, isBuild, isTxApproved, txH, txR])
+
+  useEffect(() => {
+    scroll();
+  },
+    [])
 
   return (<>
     {currentAccountID != undefined && (
@@ -90,7 +142,7 @@ export default function Transfer() {
         pb={2}
         ref={scrollRef}
       >
-        {/* <button
+        {/* <button // scroll to end of page
           onClick={() => {
             if (messageRef.current != null) { messageRef.current.scrollIntoView({ behavior: "smooth", block: "end" }) }
           }
@@ -98,11 +150,20 @@ export default function Transfer() {
         >
           Scroll to bottom
         </button> */}
-        <Text align={"center"}
+        <Center
           fontSize={"md"}
           fontWeight={"bold"}>
-          Account{currentAccountID}: <br></br> {" " + starknetAddresses[currentAccountID] + "  "}
-        </Text>
+          Account{currentAccountID}:
+        </Center>
+        <Center
+          fontSize={"md"}
+          fontWeight={"bold"}>
+          {" " + starknetAddresses[currentAccountID] + "  "}
+          <ExternalLinkIcon
+            mx='2px'
+            onClick={() => { navigator.clipboard.writeText(validateAndParseAddress(starknetAddresses[currentAccountID])) }}
+          ></ExternalLinkIcon>
+        </Center>
         <Center pb={2}>
           <QRCode
             value={starknetAddresses[currentAccountID]}
@@ -125,41 +186,47 @@ export default function Transfer() {
               />
               <FormErrorMessage color={"darkred"}>
                 {errors.targetAddress && errors.targetAddress.message}
+                {errors.targetAddress && errors.targetAddress.type=="pattern" && <span>Not a 64 char hex address</span>}
               </FormErrorMessage>
+            </FormControl>
+            <FormControl isInvalid={errors.amount as any}>
               <FormLabel htmlFor="amount0" pt={3}> ETH amount :</FormLabel>
               <Input w="100%" minH={50} maxH={500}
                 bg="gray.800"
                 textColor="blue.200"
-                defaultValue={destAddress}
+                defaultValue={amount}
                 id="amount0"
                 {...register("amount", {
-                  required: "This is required. ex: 0.001",
+                  required: "This is required. Ex: 0.001",
+                  pattern: /^\d+[\.,]?\d*$/
                 })}
               />
               <FormErrorMessage color={"darkred"}>
                 {errors.amount && errors.amount.message}
+                {errors.amount && errors.amount.type=="pattern" && <span>Not a number</span>}
               </FormErrorMessage>
-              <Input
-                color={"white"}
-                fontWeight={"bold"}
-                value="Build transfer"
-                bg={"royalblue"}
-                _hover={{
-                  background: "darkblue",
-                  color: "white",
-                }}
-                mt={2}
-                type="submit" />
             </FormControl>
-            {/* <Button
-              mt={4}
+            {/* <Input
+              color={"white"}
+              fontWeight={"bold"}
+              value="Build transfer"
+              bg={"royalblue"}
+              _hover={{
+                background: "darkblue",
+                color: "white",
+              }}
+              mt={2}
+              type="submit" /> */}
+              <Center>
+              <Button 
               colorScheme="blue"
-              borderWidth={2}
+              mt={2}
               isLoading={isSubmitting}
+              borderWidth={2}
+              borderColor={isValid?"lightblue":"red"} 
               type="submit"
-            >
-              Build transfer
-            </Button> */}
+              >Build transfer</Button>
+              </Center>
           </form>
         </Center>
         {isBuild && (<>
@@ -170,10 +237,11 @@ export default function Transfer() {
             You want to transfer {amount}Eth to {formatAddress(destAddress)},
           </Text>
           <Text align={"center"}>
-            generated hash 0x1324514534564567585687456734567435634563456345634213423634574575<br></br>
+            generated hash {hash}
+            <br></br>
           </Text>
           <Center>
-            <Button onClick={() => { transferETH() }}
+            <Button onClick={() => { transferETH(destAddress, amount) }}
               mt={2}
               colorScheme="green"
               borderWidth={2}
@@ -184,10 +252,66 @@ export default function Transfer() {
             <Center>
               Verify the hash in your Ledger and accept it to proceed.
             </Center>
+            {!!txH && (<>
+              <Box
+                bg='green.300'
+                color='black'
+                borderWidth='1px'
+                borderColor='green.800'
+                borderRadius='xl'
+                p={2} margin={2}>
+                <Center>
+                  Transaction sent. <br></br>
+                </Center>
+                <Center>
+                  txH= {txH}
+                </Center>
+                {!!txR ? (<>
+                  <Center>
+                    Result :
+                  </Center>
+                  {txR.isSuccess() ? (<>
+                    <Center>
+                      <Box
+                        bg={"green"}
+                        color={"white"}
+                        borderWidth='3px'
+                        borderColor='green.800'
+                        borderRadius='full'
+                        fontWeight={"bold"}
+                        padding={2}
+                      >
+                        Accepted in Starknet.
+                      </Box>
+                    </Center>
+                  </>) : (<>
+                    <Center>
+                      <Box
+                        bg={"orange"}
+                        color={"darkred"}
+                        borderWidth='4px'
+                        borderColor='red'
+                        borderRadius='xl'
+                        fontWeight={"bold"}
+                        padding={2}
+                      >
+                        Rejected by starknet :
+                        {recoverError(txR)}
+                      </Box>
+                    </Center>
+                  </>)}
+                </>) : (<>
+                  <Center>
+                    <Spinner color="blue" size="sm" mr={4} />
+                  </Center>
+                </>)}
+              </Box>
+            </>)}
           </>)}
         </>
         )}
-      </Box>
-    )}
+      </Box >
+    )
+    }
   </>)
 }
