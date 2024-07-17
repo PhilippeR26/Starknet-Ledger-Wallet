@@ -98,7 +98,7 @@ export async function calcHashTransaction(
             version: det.version,
         });
     } else if (Object.values(ETransactionVersion3).includes(signerDetails.version as any)) {
-        const det = signerDetails as V3InvocationsSignerDetails;
+        const det = details as V3InvocationsSignerDetails;
         msgHash = hash.calculateInvokeTransactionHash({
             ...det,
             senderAddress: det.walletAddress,

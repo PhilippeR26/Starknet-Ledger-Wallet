@@ -14,6 +14,7 @@ import { calcHashTransaction, signerList } from "./calcAccount";
 import { erc20Abi } from "../../../contracts//abis/ERC20abi";
 import { formatAddress } from "@/utils/utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import Declare from "./Declare";
 interface FormValues {
   targetAddress: string,
   amount: string
@@ -186,7 +187,7 @@ export default function Transfer() {
               />
               <FormErrorMessage color={"darkred"}>
                 {errors.targetAddress && errors.targetAddress.message}
-                {errors.targetAddress && errors.targetAddress.type=="pattern" && <span>Not a 64 char hex address</span>}
+                {errors.targetAddress && errors.targetAddress.type == "pattern" && <span>Not a 64 char hex address</span>}
               </FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={errors.amount as any}>
@@ -203,7 +204,7 @@ export default function Transfer() {
               />
               <FormErrorMessage color={"darkred"}>
                 {errors.amount && errors.amount.message}
-                {errors.amount && errors.amount.type=="pattern" && <span>Not a number</span>}
+                {errors.amount && errors.amount.type == "pattern" && <span>Not a number</span>}
               </FormErrorMessage>
             </FormControl>
             {/* <Input
@@ -217,16 +218,16 @@ export default function Transfer() {
               }}
               mt={2}
               type="submit" /> */}
-              <Center>
-              <Button 
-              colorScheme="blue"
-              mt={2}
-              isLoading={isSubmitting}
-              borderWidth={2}
-              borderColor={isValid?"lightblue":"red"} 
-              type="submit"
+            <Center>
+              <Button
+                colorScheme="blue"
+                mt={2}
+                isLoading={isSubmitting}
+                borderWidth={2}
+                borderColor={isValid ? "lightblue" : "red"}
+                type="submit"
               >Build transfer</Button>
-              </Center>
+            </Center>
           </form>
         </Center>
         {isBuild && (<>
@@ -310,6 +311,9 @@ export default function Transfer() {
           </>)}
         </>
         )}
+        <Center>
+          <Declare></Declare>
+        </Center>
       </Box >
     )
     }
