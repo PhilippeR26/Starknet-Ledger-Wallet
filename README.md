@@ -17,6 +17,8 @@
 ## Launch 🚀 : 
 
 ### local
+Launch a local devnet-rs : https://github.com/0xSpaceShard/starknet-devnet-rs
+
 `npm run dev` then open http://localhost:3000/
 
 ### Deployed DAPP
