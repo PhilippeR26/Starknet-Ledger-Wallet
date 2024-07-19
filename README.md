@@ -1,4 +1,4 @@
-# Starknet-Ledget-Wallet
+# Starknet-Ledger-Wallet
 
 
 <p align="center">
@@ -20,7 +20,7 @@
 `npm run dev` then open http://localhost:3000/
 
 ### Deployed DAPP
-https://starknet-ledget-wallet.vercel.app/
+https://starkner-ledget-wallet.vercel.app/
 
 NanoX bluetooth : experimental : https://starknet-ledger-wallet-git-nanox-philipper26s-projects.vercel.app/
 (do not work on linux mint)
