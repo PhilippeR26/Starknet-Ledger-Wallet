@@ -1,6 +1,7 @@
 import { NB_ACCOUNTS } from "@/utils/constants";
+import type { LedgerSigner } from "starknet";
 import { create } from "zustand";
-
+import type Transport from "@ledgerhq/hw-transport";
 // 0 = Mainnet
 // 1 = Sepolia
 // 2 = devnet-rs
@@ -8,15 +9,18 @@ import { create } from "zustand";
 interface FrontEndState {
     currentFrontendNetworkIndex: number,
     setCurrentFrontendNetworkIndex: (currentFrontendNetworkIndex: number) => void,
-    currentAccountID: number|undefined,
+    currentAccountID: number | undefined,
     setCurrentAccountID: (currentAccountID: number) => void,
-        isStarknetAppOpen: boolean,
+    isStarknetAppOpen: boolean,
     setIsStarknetAppOpen: (isStarknetAppOpen: boolean) => void,
-    starknetPublicKey:string[],
+    starknetPublicKey: string[],
     setStarknetPublicKey: (starknetPublicKey: string[]) => void,
-    starknetAddresses:string[],
+    starknetAddresses: string[],
     setStarknetAddresses: (starknetAddresses: string[]) => void,
-
+    ledgerSigners: LedgerSigner[] | undefined,
+    setLedgerSigners: (ledgerSigner: LedgerSigner[]) => void,
+    transport: Transport | undefined,
+    setTransport: (transport: Transport) => void,
 }
 
 export const useGlobalContext = create<FrontEndState>()(set => ({
@@ -30,4 +34,8 @@ export const useGlobalContext = create<FrontEndState>()(set => ({
     setStarknetPublicKey: (starknetPublicKey: string[]) => { set(state => ({ starknetPublicKey })) },
     starknetAddresses: new Array(NB_ACCOUNTS).fill(""),
     setStarknetAddresses: (starknetAddresses: string[]) => { set(state => ({ starknetAddresses })) },
+    ledgerSigners: undefined,
+    setLedgerSigners: (ledgerSigners: LedgerSigner[]) => { set(state => ({ ledgerSigners })) },
+    transport: undefined,
+    setTransport: (transport: Transport) => { set(state => ({ transport })) },
 }));

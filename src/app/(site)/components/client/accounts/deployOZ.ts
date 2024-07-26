@@ -1,21 +1,16 @@
 // Deploy an OpenZeppelin 0.14.0 account in devnet.
 // Coded with Starknet.js v6.11.0 & devnet-rs v0.1.1 & starknet-devnet.js v0.0.4
 
-import { RpcProvider, Account, Contract, ec, json, RawArgs, stark, num, uint256, Calldata, CallData, shortString, constants, hash, type BigNumberish, types, cairo, CairoCustomEnum, CairoOption, CairoOptionVariant } from "starknet";
+import { RpcProvider, Account,  CallData, hash, LedgerSigner } from "starknet";
 import { DevnetProvider } from "starknet-devnet";
-//import { OutsideExecution, OutsideExecutionOptions } from 'starknet';
-
-
-import fs from "fs";
 import * as dotenv from "dotenv";
-import type { LedgerUSBnodeSigner } from "./classLedgerSigner";
 import { accountClass } from "@/utils/constants";
 import type { DeployAccountResp } from "@/type/types";
 dotenv.config();
 
 export async function deployAccountOpenzeppelin14(
   myProvider: RpcProvider,
-  signer: LedgerUSBnodeSigner
+  signer: LedgerSigner
 ): Promise<DeployAccountResp> {
   const l2DevnetProvider = new DevnetProvider({ timeout: 40_000 });
 

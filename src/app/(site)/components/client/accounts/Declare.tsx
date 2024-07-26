@@ -5,7 +5,6 @@ import contractCasm from "../../../contracts/counter.casm.json";
 import { useGlobalContext } from "../globalContext";
 import { myFrontendProviders } from "@/utils/constants";
 import { Account, hash } from "starknet";
-import { signerList } from "./calcAccount";
 
 export default function Declare() {
     const [declareStatus, setDeclareStatus] = useState<boolean>(false);
@@ -14,12 +13,13 @@ export default function Declare() {
     const currentFrontendNetworkIndex = useGlobalContext(state => state.currentFrontendNetworkIndex);
     const toast = useToast();
     const scrollRef = useRef<null | HTMLDivElement>(null);
+    const ledgerSigners = useGlobalContext(state => state.ledgerSigners);
 
 
 
     async function declareClass() {
         const myProvider = myFrontendProviders[currentFrontendNetworkIndex];
-        const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
+        const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], ledgerSigners![currentAccountID!]);
         const contractHash = hash.computeContractClassHash(contractSierra); console.log({ contractHash });
 
         try {

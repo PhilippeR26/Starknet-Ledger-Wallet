@@ -10,7 +10,7 @@ import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import type { DeployAccountResp } from "@/type/types";
 import { addrETH, myFrontendProviders } from "@/utils/constants";
 import { DevnetProvider } from "starknet-devnet";
-import { calcHashTransaction, signerList } from "./calcAccount";
+import { calcHashTransaction } from "./calcAccount";
 import { erc20Abi } from "../../../contracts//abis/ERC20abi";
 import { formatAddress } from "@/utils/utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
@@ -33,6 +33,8 @@ export default function Transfer() {
   const [hash, setHash] = useState<string>("");
   const [txH, setTxH] = useState<string>("");
   const [txR, setTxR] = useState<GetTransactionReceiptResponse | undefined>(undefined);
+  const ledgerSigners = useGlobalContext(state => state.ledgerSigners);
+
 
   const {
     handleSubmit,
@@ -50,7 +52,7 @@ export default function Transfer() {
   }
 
   async function buildCall(addr: string, amountETH: string): Promise<Call> {
-    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
+    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], await ledgerSigners![currentAccountID!]);
     const ethContract = new Contract(erc20Abi, addrETH, myAccount);
 
     let decimal: string = "";
@@ -81,7 +83,7 @@ export default function Transfer() {
     const myProvider = myFrontendProviders[2];
     const myCall = await buildCall(addr, amountETH);
     console.log("transfer to sign");
-    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
+    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], ledgerSigners![currentAccountID!]);
     const resp = await myAccount.execute(myCall);
     console.log("transferred!");
     setTxH(resp.transaction_hash);
@@ -103,7 +105,7 @@ export default function Transfer() {
   }
 
   async function calcHash(addr: string, amountETH: string): Promise<string> {
-    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], signerList[currentAccountID!]);
+    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], ledgerSigners![currentAccountID!]);
     return calcHashTransaction(await buildCall(addr
       , amountETH
     ), myAccount);

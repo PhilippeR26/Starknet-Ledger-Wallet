@@ -1,13 +1,22 @@
 import { accountClass } from "@/utils/constants";
-import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type EstimateFeeAction, type InvocationsSignerDetails, type UniversalDetails, type V2InvocationsSignerDetails, type V3InvocationsSignerDetails } from "starknet";
-import { LedgerUSBnodeSigner } from "./classLedgerSigner";
+import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type EstimateFeeAction, type InvocationsSignerDetails, type UniversalDetails, type V2InvocationsSignerDetails, type V3InvocationsSignerDetails, LedgerSigner } from "starknet";
 import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3, type ResourceBounds } from "@starknet-io/types-js";
+import TransportWebHid from "@ledgerhq/hw-transport-webhid";
+import TransportWebBluetooth from "@ledgerhq/hw-transport-web-ble";
+import type Transport from "@ledgerhq/hw-transport";
 
-const signerListTmp: LedgerUSBnodeSigner[] = [];
-for (let id: number = 0; id < 5; id++) {
-    signerListTmp.push(new LedgerUSBnodeSigner(id));
+
+export async function createTransport(): Promise<Transport> {
+    const transport = await TransportWebHid.create();
+    return transport;
 }
-export const signerList: LedgerUSBnodeSigner[] = signerListTmp;
+export async function createSignerList(myTransport: Transport): Promise<LedgerSigner[]> {
+    const signerListTmp: LedgerSigner[] = [];
+    for (let id: number = 0; id < 5; id++) {
+        signerListTmp.push(new LedgerSigner(myTransport, id));
+    }
+    return signerListTmp;
+}
 
 export function CalcAccountsAddress(pubK: string[]): string[] {
     const addresses = pubK.map((pubK: string) => {
@@ -34,24 +43,24 @@ export async function calcHashTransaction(
         version: ETransactionVersion,
         { type, payload }: EstimateFeeAction,
         details: UniversalDetails
-      ) {
+    ) {
         let maxFee: BigNumberish = 0;
         let resourceBounds: ResourceBounds = stark.estimateFeeToBounds(constants.ZERO);
         if (version === ETransactionVersion.V3) {
-          resourceBounds =
-            details.resourceBounds ??
-            (await account.getSuggestedFee({ type, payload } as any, details)).resourceBounds;
+            resourceBounds =
+                details.resourceBounds ??
+                (await account.getSuggestedFee({ type, payload } as any, details)).resourceBounds;
         } else {
-          maxFee =
-            details.maxFee ??
-            (await account.getSuggestedFee({ type, payload } as any, details)).suggestedMaxFee;
+            maxFee =
+                details.maxFee ??
+                (await account.getSuggestedFee({ type, payload } as any, details)).suggestedMaxFee;
         }
-    
+
         return {
-          maxFee,
-          resourceBounds,
+            maxFee,
+            resourceBounds,
         };
-      }
+    }
 
     const details: UniversalDetails = {};
     const calls = Array.isArray(transactions) ? transactions : [transactions];

@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { useGlobalContext } from "../globalContext";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
 import { NB_ACCOUNTS, addrETH, myFrontendProviders, tokenAddr } from "@/utils/constants";
-import { CalcAccountsAddress, signerList } from "./calcAccount";
+import { CalcAccountsAddress, createSignerList, createTransport } from "./calcAccount";
 import { formatAddress, formatBalance, formatBalanceShort } from "@/utils/utils";
 import type { DeployAccountResp } from "@/type/types";
 import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import GetBalance from "../Contract/GetBalance";
 import { erc20Abi } from "@/app/(site)/contracts/abis/ERC20abi";
-import { Contract, validateAndParseAddress } from "starknet";
+import { Contract, validateAndParseAddress, type LedgerSigner } from "starknet";
 import GetBalanceSimple from "../Contract/GetBalanceSimple";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import type Transport from "@ledgerhq/hw-transport";
 
 
 
@@ -37,24 +38,44 @@ export default function DisplayAccounts() {
   const [deployInProgress, setDeployInProgress] = useState<number>(0);
   const toast = useToast();
   const scrollRef = useRef<null | HTMLDivElement>(null);
+  const ledgerSigners = useGlobalContext(state => state.ledgerSigners);
+  const setLedgerSigners = useGlobalContext(state => state.setLedgerSigners);
+  const setTransport = useGlobalContext(state => state.setTransport);
 
 
   async function appConnected() {
     try {
       setSeek(true);
+      const myTransport: Transport = await createTransport();
+      setTransport(myTransport);
+      console.log("transport initialized", myTransport);
+      console.log("try init signers");
+      const mySignersList: LedgerSigner[] = await createSignerList(myTransport);
+      setLedgerSigners(mySignersList);
+      console.log("signers initialized");
       console.log("try read version");
-      const transport = await TransportWebHid.create(undefined, 30_000); // 30s timeout
-      const resp = await transport.send(Number("0x5a"), 0, 0, 0);
+      const resp = await myTransport.send(Number("0x5a"), 0, 0, 0);
       const appVersion = resp[0] + "." + resp[1] + "." + resp[2];
-      transport.close();
       console.log("version=", appVersion);
       setAppVersion(appVersion);
       setIsAPPconnectedLocal(true);
+      let pkList: string[] = [];
+      for (let id: number = 0; id < NB_ACCOUNTS; id++) {
+        pkList[id] = await mySignersList[id].getPubKey();
+        console.log("pubK", id, "=", pkList[id]);
+      }
+      setStarknetPublicKey(pkList);
+      const addresses = CalcAccountsAddress(pkList);
+      setStarknetAddresses(addresses);
+      setSeek(false);
+      await AreDeployed(addresses);
     } catch (err: any) {
       console.log("checkAppConnected :", err.message);
       setSeek(false);
       setIsAPPconnectedLocal(false);
     }
+
+
   }
 
   async function AreDeployed(addresses: string[]) {
@@ -76,31 +97,9 @@ export default function DisplayAccounts() {
 
   }
 
-  async function getPubK() {
-    let pkList: string[] = [];
-    setSeek(true);
-    try {
-      for (let id: number = 0; id < NB_ACCOUNTS; id++) {
-        pkList[id] = await signerList[id].getPubKey();
-        console.log("pubK", id, "=", pkList[id]);
-      }
-      setStarknetPublicKey(pkList);
-      const addresses = CalcAccountsAddress(pkList);
-      setStarknetAddresses(addresses);
-      setSeek(false);
-      await AreDeployed(addresses);
-
-    } catch (err: any) {
-      console.log("Error read pubK", err.message);
-      setIsAPPconnectedLocal(false);
-      setSeek(false);
-    }
-  }
-
   async function go() {
     setGo(true);
     await appConnected();
-    await getPubK()
   }
 
   async function deployAccount(id: number) {
@@ -110,7 +109,7 @@ export default function DisplayAccounts() {
       setDeployInProgress(1);
       const myProvider = myFrontendProviders[2];
       const addr = starknetAddresses[id!];
-      const resp: DeployAccountResp = await deployAccountOpenzeppelin14(myProvider, signerList[id]);
+      const resp: DeployAccountResp = await deployAccountOpenzeppelin14(myProvider, ledgerSigners![id]);
       setIsDeployed(isDeployed.map(
         (val: boolean, idx: number) => {
           if (idx == id) { return true } else { return val }
@@ -161,9 +160,9 @@ export default function DisplayAccounts() {
     [seekInProgress])
 
   return (
-    <Box 
-    mt={2}
-    ref={scrollRef}
+    <Box
+      mt={2}
+      ref={scrollRef}
     >
       <Center>
         <Button bg={"blue.200"}
@@ -212,9 +211,9 @@ export default function DisplayAccounts() {
                   key={"listAcc" + idx.toString()}
                   disabled={isDeployed[idx] ? false : true}
                 >
-                  Account {idx} : {formatAddress(addr)}<ExternalLinkIcon 
-                  mx='2px'
-                  onClick={() => {navigator.clipboard.writeText(validateAndParseAddress(addr))}}
+                  Account {idx} : {formatAddress(addr)}<ExternalLinkIcon
+                    mx='2px'
+                    onClick={() => { navigator.clipboard.writeText(validateAndParseAddress(addr)) }}
                   ></ExternalLinkIcon>{" "}
                   {!isDeployed[idx] ? (
                     <>

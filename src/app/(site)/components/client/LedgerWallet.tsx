@@ -1,15 +1,19 @@
 "use client";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Box, Center, Link, Text } from "@chakra-ui/react"
-import { constants, types, type types as ert } from "starknet";
+import { constants, types, type types as ert, type LedgerSigner } from "starknet";
 import SelectNetwork from "./SelectNetwork";
 import DisplayAccounts from "./accounts/DisplayAccounts";
 import Transfer from "./accounts/Transfer";
+import { useEffect } from "react";
+import { useGlobalContext } from "./globalContext";
+import { createSignerList, createTransport } from "./accounts/calcAccount";
+import type Transport from "@ledgerhq/hw-transport";
+
 
 
 export default function LedgerWallet() {
-
-
+  
   return (
     <>
       <Box bg={"steelblue"} pb={2}>
