@@ -50,7 +50,7 @@ export default function DisplayAccounts() {
       setTransport(myTransport);
       console.log("transport initialized", myTransport);
       console.log("try init signers");
-      const mySignersList: LedgerSigner[] = await createSignerList(myTransport);
+      const mySignersList: LedgerSigner<any>[] = await createSignerList(myTransport);
       setLedgerSigners(mySignersList);
       console.log("signers initialized");
       console.log("try read version");

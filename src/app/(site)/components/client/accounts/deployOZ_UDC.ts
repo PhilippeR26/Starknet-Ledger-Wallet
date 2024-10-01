@@ -10,7 +10,7 @@ import { accountClass } from "@/utils/constants";
 import type { DeployAccountResp } from "@/type/types";
 dotenv.config();
 
-export async function deployAccountOpenzeppelin14(myProvider: RpcProvider,signer:LedgerSigner):Promise<DeployAccountResp> {
+export async function deployAccountOpenzeppelin14(myProvider: RpcProvider,signer:LedgerSigner<any>):Promise<DeployAccountResp> {
   const devnetProvider = new DevnetProvider();
   const accounts=await devnetProvider.getPredeployedAccounts();
   const account0=new Account(myProvider,accounts[0].address,accounts[0].private_key);

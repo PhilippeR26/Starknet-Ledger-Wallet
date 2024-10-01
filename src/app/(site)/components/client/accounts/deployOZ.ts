@@ -10,7 +10,7 @@ dotenv.config();
 
 export async function deployAccountOpenzeppelin14(
   myProvider: RpcProvider,
-  signer: LedgerSigner
+  signer: LedgerSigner<any>
 ): Promise<DeployAccountResp> {
   const l2DevnetProvider = new DevnetProvider({ timeout: 40_000 });
 

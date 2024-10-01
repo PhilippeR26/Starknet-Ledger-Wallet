@@ -10,8 +10,8 @@ export async function createTransport(): Promise<Transport> {
     const transport = await TransportWebHid.create();
     return transport;
 }
-export async function createSignerList(myTransport: Transport): Promise<LedgerSigner[]> {
-    const signerListTmp: LedgerSigner[] = [];
+export async function createSignerList(myTransport: Transport): Promise<LedgerSigner<any>[]> {
+    const signerListTmp: LedgerSigner<any>[] = [];
     for (let id: number = 0; id < 5; id++) {
         signerListTmp.push(new LedgerSigner(myTransport, id));
     }

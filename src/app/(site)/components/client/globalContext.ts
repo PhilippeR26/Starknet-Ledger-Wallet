@@ -17,8 +17,8 @@ interface FrontEndState {
     setStarknetPublicKey: (starknetPublicKey: string[]) => void,
     starknetAddresses: string[],
     setStarknetAddresses: (starknetAddresses: string[]) => void,
-    ledgerSigners: LedgerSigner[] | undefined,
-    setLedgerSigners: (ledgerSigner: LedgerSigner[]) => void,
+    ledgerSigners: LedgerSigner<any>[] | undefined,
+    setLedgerSigners: (ledgerSigner: LedgerSigner<any>[]) => void,
     transport: Transport | undefined,
     setTransport: (transport: Transport) => void,
 }
@@ -35,7 +35,7 @@ export const useGlobalContext = create<FrontEndState>()(set => ({
     starknetAddresses: new Array(NB_ACCOUNTS).fill(""),
     setStarknetAddresses: (starknetAddresses: string[]) => { set(state => ({ starknetAddresses })) },
     ledgerSigners: undefined,
-    setLedgerSigners: (ledgerSigners: LedgerSigner[]) => { set(state => ({ ledgerSigners })) },
+    setLedgerSigners: (ledgerSigners: LedgerSigner<any>[]) => { set(state => ({ ledgerSigners })) },
     transport: undefined,
     setTransport: (transport: Transport) => { set(state => ({ transport })) },
 }));
