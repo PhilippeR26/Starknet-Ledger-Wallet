@@ -35,7 +35,7 @@
     "react-qr-code": "^2.0.15",
     "sharp": "^0.33.4",
     "starknet": "^6.14.1",
-    "starknet-devnet": "0.0.5",
+    "starknet-devnet": "0.2.0",
     "typescript": "^5.5.3",
     "zustand": "^4.5.4"
   },
