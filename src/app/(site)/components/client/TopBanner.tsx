@@ -25,7 +25,7 @@ export default function TopBanner() {
             textColor="black"
           >
             Powered by
-            <Link color="blue.700" href='https://starknetjs.com' isExternal> Starknet.js v6.11.0<ExternalLinkIcon mx='2px'></ExternalLinkIcon></Link>
+            <Link color="blue.700" href='https://starknetjs.com' isExternal> Starknet.js v6.14.0<ExternalLinkIcon mx='2px'></ExternalLinkIcon></Link>
             .
             <Link color="blue.700" href='https://github.com/PhilippeR26/Starknet-Ledger-Wallet' isExternal> Source code<ExternalLinkIcon mx='2px'></ExternalLinkIcon></Link>
             .

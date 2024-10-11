@@ -240,7 +240,7 @@ export default function Transfer() {
             You want to transfer {amount}Eth to {formatAddress(destAddress)},
           </Text>
           <Text align={"center"}>
-            generated hash {hash}
+            generated hash tx {hash}
             <br></br>
           </Text>
           <Center>
@@ -253,7 +253,7 @@ export default function Transfer() {
           </Center>
           {isTxApproved && (<>
             <Center>
-              Verify the hash in your Ledger and accept it to proceed.
+              Approve the transaction in your Ledger Nano.
             </Center>
             {!!txH && (<>
               <Box

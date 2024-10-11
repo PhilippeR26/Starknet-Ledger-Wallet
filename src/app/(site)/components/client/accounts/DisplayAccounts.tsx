@@ -10,7 +10,7 @@ import type { DeployAccountResp } from "@/type/types";
 import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import GetBalance from "../Contract/GetBalance";
 import { erc20Abi } from "@/app/(site)/contracts/abis/ERC20abi";
-import { Contract, validateAndParseAddress, type LedgerSigner } from "starknet";
+import { Contract, validateAndParseAddress, type LedgerSigner211 } from "starknet";
 import GetBalanceSimple from "../Contract/GetBalanceSimple";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import type Transport from "@ledgerhq/hw-transport";
@@ -50,7 +50,7 @@ export default function DisplayAccounts() {
       setTransport(myTransport);
       console.log("transport initialized", myTransport);
       console.log("try init signers");
-      const mySignersList: LedgerSigner<any>[] = await createSignerList(myTransport);
+      const mySignersList: LedgerSigner211<any>[] = await createSignerList(myTransport);
       setLedgerSigners(mySignersList);
       console.log("signers initialized");
       console.log("try read version");

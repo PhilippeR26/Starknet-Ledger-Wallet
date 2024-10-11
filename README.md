@@ -51,10 +51,25 @@ NanoX bluetooth : experimental : https://starknet-ledger-wallet-git-nanox-philip
 The Starknet APP has to be installed in your Ledger. If not visible in Ledger Live, set its configuration to  `experimental`.
 
 > [!NOTE]
-> This DAPP is compatible with the Ledger Starknet APP v1.1.1
+> This DAPP is compatible with the Ledger Starknet APP v2.1.1
 
 This version of DAPP requests to connect the Ledger Nano to an USB connector of your computer.
 
 # Network :
 
 Today, the DAPP is only working with the [devnet-rs](https://github.com/0xSpaceShard/starknet-devnet-rs) network. 
+
+Note that to handle devnet-rs, I am using this lib :  
+`"starknet-devnet": "0.2.0",`
+
+To use this lib, some code has to be added in `next.config.ts` :
+```typescript
+webpack: (config) => {
+    config.resolve.fallback = {
+      fs: false,
+      net: false,
+      child_process: false,
+    }
+    return config;
+  }
+```

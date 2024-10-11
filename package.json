@@ -34,7 +34,7 @@
     "react-hook-form": "^7.52.1",
     "react-qr-code": "^2.0.15",
     "sharp": "^0.33.4",
-    "starknet": "^6.14.1",
+    "starknet": "file:/D/starknetFork/starknet.js",
     "starknet-devnet": "0.2.0",
     "typescript": "^5.5.3",
     "zustand": "^4.5.4"
