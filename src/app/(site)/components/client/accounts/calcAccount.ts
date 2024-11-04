@@ -1,5 +1,5 @@
 import { accountClass } from "@/utils/constants";
-import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type EstimateFeeAction, type InvocationsSignerDetails, type UniversalDetails, type V2InvocationsSignerDetails, type V3InvocationsSignerDetails, LedgerSigner211 } from "starknet";
+import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type EstimateFeeAction, type InvocationsSignerDetails, type UniversalDetails, type V2InvocationsSignerDetails, type V3InvocationsSignerDetails, LedgerSigner221 } from "starknet";
 import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3, type ResourceBounds } from "@starknet-io/types-js";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
 import TransportWebBluetooth from "@ledgerhq/hw-transport-web-ble";
@@ -10,10 +10,10 @@ export async function createTransport(): Promise<Transport> {
     const transport = await TransportWebHid.create();
     return transport;
 }
-export async function createSignerList(myTransport: Transport): Promise<LedgerSigner211<any>[]> {
-    const signerListTmp: LedgerSigner211<any>[] = [];
+export async function createSignerList(myTransport: Transport): Promise<LedgerSigner221<any>[]> {
+    const signerListTmp: LedgerSigner221<any>[] = [];
     for (let id: number = 0; id < 5; id++) {
-        signerListTmp.push(new LedgerSigner211(myTransport, id));
+        signerListTmp.push(new LedgerSigner221(myTransport, id));
     }
     return signerListTmp;
 }
