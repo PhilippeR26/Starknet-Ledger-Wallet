@@ -1,6 +1,3 @@
-// deploy in testnet a contract.
-// launch with npx ts-node src/scripts/Starknet12/Starknet-testnet/2a.deployTestERC721.ts
-// Coded with Starknet.js v6.6.6 + starknet devnet-rs 0.0.3
 
 import { constants, Provider, Contract, Account, json, shortString, RpcProvider, hash, CallData, Call, stark, InvokeFunctionResponse, Calldata, ec, type InvokeTransactionReceiptResponse, type SuccessfulTransactionReceiptResponse,events , type CompiledSierra } from "starknet";
 import fs from "fs";
@@ -10,7 +7,7 @@ import { addrETH } from "@/utils/constants";
 
 async function main() {
     // initialize Provider
-    const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); // only starknet-devnet-rs
+    const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); // only starknet-devnet
     // const provider = new RpcProvider({ nodeUrl: "https://json-rpc.starknet-testnet.public.lavanet.xyz" }); // testnet
     //const provider = new RpcProvider({ nodeUrl: "http://192.168.1.11:9545/rpc/v0_7" }); // local pathfinder testnet node
     //const provider = new RpcProvider({ nodeUrl: "https://starknet-sepolia.public.blastapi.io/rpc/v0_7" });
@@ -18,7 +15,7 @@ async function main() {
     // Check that communication with provider is OK
     console.log("chain Id =", shortString.decodeShortString(await provider.getChainId()), ", rpc", await provider.getSpecVersion());
 
-    // //devnet-rs
+    //devnet
     const accountAddress0: string = "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691";
     const privateKey0 = "0x71d7bb07b9a64f6f78ac4c816aff4da9";
 

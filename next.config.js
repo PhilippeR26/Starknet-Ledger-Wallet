@@ -1,12 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   // output: 'export',
   // images: {
 	// 	unoptimized: true
 	// }
-  webpack: (config) => {
+  webpack: (config) => { // for starknet-devnet library
     config.resolve.fallback = {
       fs: false,
       net: false,

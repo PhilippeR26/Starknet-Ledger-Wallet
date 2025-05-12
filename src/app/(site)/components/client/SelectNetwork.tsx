@@ -26,7 +26,7 @@ export default function SelectNetwork() {
 
     async function declareAccount() {
         //const resp= await myFrontendProviders[2].getClassByHash(accountClass);
-        console.log("Declare account class in devnet-rs");
+        console.log("Declare account class in devnet");
         const devnetProvider = new DevnetProvider();
         const myProvider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" });
         const acc = await devnetProvider.getPredeployedAccounts();
@@ -37,13 +37,17 @@ export default function SelectNetwork() {
         try {
             await myProvider.getClassByHash(accountClass);
             isDeclared = true;
+            console.log("already declared");
         } catch { }
         if (!isDeclared) {
             setIsDeclare(1);
+            console.log("try declare");
             const respDecl = await account0.declareIfNot({ contract: contractSierra, casm: contractCasm });
             if (respDecl.transaction_hash) {
                 await myProvider.waitForTransaction(respDecl.transaction_hash);
-                console.log("Account class declared in devnet-rs at :", respDecl.class_hash)
+                console.log("Account class declared in devnet at :", respDecl.class_hash)
+            } else {
+                console.log("Not declared");
             }
             setIsDeclare(2);
         }
@@ -57,7 +61,7 @@ export default function SelectNetwork() {
     }
         , [currentNetworkID]);
 
-        // only if devnet-rs only :
+        // only if devnet only :
      useEffect(() => {
         setCurrentNetworkID(2);
             declareAccount();
@@ -102,7 +106,7 @@ export default function SelectNetwork() {
                 >
                     <option value='0' disabled={true}>Mainnet</option>
                     <option value='1' disabled={true}>Sepolia testnet</option>
-                    <option value='2'>Devnet-rs</option>
+                    <option value='2'>Devnet 0.3+</option>
                 </Select>
             </Center>
 

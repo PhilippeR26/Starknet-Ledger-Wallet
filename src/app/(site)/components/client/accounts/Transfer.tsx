@@ -4,12 +4,9 @@ import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel, Input, S
 import { useGlobalContext } from "../globalContext";
 import QRCode from "react-qr-code";
 import { useForm } from "react-hook-form";
-import { CallData, num, json, Account, Contract, type Call, type GetTransactionReceiptResponse, type RejectedTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress } from "starknet";
+import { CallData, num, json, Account, Contract, type Call, type GetTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress } from "starknet";
 import { useEffect, useRef, useState } from "react";
-import { deployAccountOpenzeppelin14 } from "./deployOZ";
-import type { DeployAccountResp } from "@/type/types";
 import { addrETH, myFrontendProviders } from "@/utils/constants";
-import { DevnetProvider } from "starknet-devnet";
 import { calcHashTransaction } from "./calcAccount";
 import { erc20Abi } from "../../../contracts//abis/ERC20abi";
 import { formatAddress } from "@/utils/utils";
@@ -47,6 +44,7 @@ export default function Transfer() {
     setDestAddress(values.targetAddress);
     setAmount(values.amount);
     setIsBuild(true);
+    console.log("calc hash inputs:", values);
     setHash(await calcHash(values.targetAddress, values.amount));
 
   }
@@ -94,7 +92,9 @@ export default function Transfer() {
   }
 
   function scroll() {
+    console.log("scroll");
     if (scrollRef.current) {
+      console.log("scroll proceed...");
       scrollRef.current.scrollIntoView(
         {
           behavior: 'smooth',
@@ -115,9 +115,6 @@ export default function Transfer() {
     let resp: string = "";
     txR.match({
 
-      rejected: (txR: RejectedTransactionReceiptResponse) => {
-        resp = txR.status + " " + txR.transaction_failure_reason
-      },
       reverted: (txR: RevertedTransactionReceiptResponse) => {
         resp = txR.execution_status + " " + txR.revert_reason
       },
@@ -240,7 +237,7 @@ export default function Transfer() {
             You want to transfer {amount}Eth to {formatAddress(destAddress)},
           </Text>
           <Text align={"center"}>
-            generated hash tx {hash}
+            Expected tx hash {hash}
             <br></br>
           </Text>
           <Center>
@@ -277,8 +274,8 @@ export default function Transfer() {
                     <Center>
                       <Box
                         bg={"green"}
-                        color={"white"}
-                        borderWidth='3px'
+                        color={"black"}
+                        // borderWidth='3px'
                         borderColor='green.800'
                         borderRadius='full'
                         fontWeight={"bold"}
@@ -292,7 +289,7 @@ export default function Transfer() {
                       <Box
                         bg={"orange"}
                         color={"darkred"}
-                        borderWidth='4px'
+                        // borderWidth='4px'
                         borderColor='red'
                         borderRadius='xl'
                         fontWeight={"bold"}

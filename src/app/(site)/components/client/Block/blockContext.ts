@@ -14,7 +14,7 @@ export const dataBlockInit:DataBlock={
     l1_gas_price: {price_in_fri:"N/A", price_in_wei:"N/A"},
 }
 
-export interface BlockState {
+interface BlockState {
     dataBlock: DataBlock,
     setBlockData:(blockInfo:DataBlock) =>void,
 }

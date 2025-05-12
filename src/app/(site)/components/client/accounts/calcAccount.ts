@@ -1,6 +1,6 @@
 import { accountClass } from "@/utils/constants";
-import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type EstimateFeeAction, type InvocationsSignerDetails, type UniversalDetails, type V2InvocationsSignerDetails, type V3InvocationsSignerDetails, LedgerSigner221 } from "starknet";
-import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3, type ResourceBounds } from "@starknet-io/types-js";
+import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type EstimateFeeAction, type InvocationsSignerDetails, type UniversalDetails, type V2InvocationsSignerDetails, type V3InvocationsSignerDetails, LedgerSigner231, type ResourceBounds } from "starknet";
+import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3} from "@starknet-io/types-js";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
 import TransportWebBluetooth from "@ledgerhq/hw-transport-web-ble";
 import type Transport from "@ledgerhq/hw-transport";
@@ -10,10 +10,10 @@ export async function createTransport(): Promise<Transport> {
     const transport = await TransportWebHid.create();
     return transport;
 }
-export async function createSignerList(myTransport: Transport): Promise<LedgerSigner221<any>[]> {
-    const signerListTmp: LedgerSigner221<any>[] = [];
+export async function createSignerList(myTransport: Transport): Promise<LedgerSigner231<any>[]> {
+    const signerListTmp: LedgerSigner231<any>[] = [];
     for (let id: number = 0; id < 5; id++) {
-        signerListTmp.push(new LedgerSigner221(myTransport, id));
+        signerListTmp.push(new LedgerSigner231(myTransport, id));
     }
     return signerListTmp;
 }
@@ -45,7 +45,7 @@ export async function calcHashTransaction(
         details: UniversalDetails
     ) {
         let maxFee: BigNumberish = 0;
-        let resourceBounds: ResourceBounds = stark.estimateFeeToBounds(constants.ZERO);
+        let resourceBounds:ResourceBounds=stark.estimateFeeToBounds(constants.ZERO);
         if (version === ETransactionVersion.V3) {
             resourceBounds =
                 details.resourceBounds ??
@@ -69,6 +69,7 @@ export async function calcHashTransaction(
         getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
         details.version
     );
+    console.log({version});
 
     const estimate = await getUniversalSuggestedFee(
         version,
@@ -107,7 +108,8 @@ export async function calcHashTransaction(
             version: det.version,
         });
     } else if (Object.values(ETransactionVersion3).includes(signerDetails.version as any)) {
-        const det = details as V3InvocationsSignerDetails;
+        const det = signerDetails as V3InvocationsSignerDetails;
+        console.log("det=", det);
         msgHash = hash.calculateInvokeTransactionHash({
             ...det,
             senderAddress: det.walletAddress,

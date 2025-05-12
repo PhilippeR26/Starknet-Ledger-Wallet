@@ -10,39 +10,33 @@
     "static": "next build && next export"
   },
   "dependencies": {
-    "@capacitor/android": "^6.1.0",
-    "@capacitor/core": "^6.1.0",
-    "@capacitor/ios": "^6.1.0",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@ledgerhq/hw-transport": "^6.31.1",
-    "@ledgerhq/hw-transport-web-ble": "^6.29.1",
-    "@ledgerhq/hw-transport-webhid": "^6.29.0",
-    "@starknet-io/types-js": "^0.7.7",
+    "@ledgerhq/hw-transport": "^6.31.4",
+    "@ledgerhq/hw-transport-web-ble": "^6.29.4",
+    "@ledgerhq/hw-transport-webhid": "^6.30.0",
+    "@starknet-io/types-js": "^0.8.1",
     "@types/node": "20.14.10",
-    "@types/react": "18.3.3",
-    "@types/react-dom": "18.3.0",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
     "dotenv": "^16.4.5",
-    "framer-motion": "^11.2.14",
-    "get-starknet-core": "^4.0.0",
-    "next": "^14.2.4",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-hook-form": "^7.52.1",
+    "framer-motion": "^12.9.2",
+    "@starknet-io/get-starknet-core": "^4.0.7",
+    "next": "^15.3.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-hook-form": "^7.56.1",
     "react-qr-code": "^2.0.15",
-    "sharp": "^0.33.4",
-    "starknet": "file:/D/starknetFork/starknet.js",
-    "starknet-devnet": "0.2.0",
-    "typescript": "^5.5.3",
-    "zustand": "^4.5.4"
+    "starknet": "7.2.0",
+    "starknet-devnet": "0.4.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.1.0",
     "encoding": "^0.1.13",
-    "simple-zustand-devtools": "^1.1.0"
-  },
-  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+    "simple-zustand-devtools": "^1.1.0",
+    "typescript": "^5.5.3"
+  }
 }

@@ -1,7 +1,7 @@
 // Deploy an OpenZeppelin 0.14.0 account in devnet.
-// Coded with Starknet.js v6.11.0 & devnet-rs v0.1.1 & starknet-devnet.js v0.0.4
+// Coded with Starknet.js v7.2.0 & devnet v0.4.0 & starknet-devnet.js v0.4.0
 
-import { RpcProvider, Account,  CallData, hash, LedgerSigner221 } from "starknet";
+import { RpcProvider, Account,  CallData, hash, LedgerSigner231 } from "starknet";
 import { DevnetProvider } from "starknet-devnet";
 import * as dotenv from "dotenv";
 import { accountClass } from "@/utils/constants";
@@ -10,7 +10,7 @@ dotenv.config();
 
 export async function deployAccountOpenzeppelin14(
   myProvider: RpcProvider,
-  signer: LedgerSigner221<any>
+  signer: LedgerSigner231<any>
 ): Promise<DeployAccountResp> {
   const l2DevnetProvider = new DevnetProvider({ timeout: 40_000 });
 

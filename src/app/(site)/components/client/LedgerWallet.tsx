@@ -1,14 +1,8 @@
 "use client";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Box, Center, Link, Text } from "@chakra-ui/react"
-import { constants, types, type types as ert, type LedgerSigner221 } from "starknet";
 import SelectNetwork from "./SelectNetwork";
 import DisplayAccounts from "./accounts/DisplayAccounts";
 import Transfer from "./accounts/Transfer";
-import { useEffect } from "react";
-import { useGlobalContext } from "./globalContext";
-import { createSignerList, createTransport } from "./accounts/calcAccount";
-import type Transport from "@ledgerhq/hw-transport";
 
 
 

@@ -1,4 +1,5 @@
-import './globals.css'
+import './globals.css';
+import { ChakraProvider } from '@chakra-ui/react'
 
 export const metadata = {
   title: 'Starknet-Ledger-Wallet',
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <ChakraProvider>
+          {children}
+        </ChakraProvider>
       </body>
     </html>
   )

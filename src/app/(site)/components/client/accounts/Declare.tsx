@@ -45,7 +45,7 @@ export default function Declare() {
             const respDecl = await myAccount.declareIfNot({ contract: contractSierra, casm: contractCasm });
             if (respDecl.transaction_hash) {
                 await myProvider.waitForTransaction(respDecl.transaction_hash);
-                console.log("contract class declared in devnet-rs at :", respDecl.class_hash)
+                console.log("contract class declared in devnet at :", respDecl.class_hash)
             }
             toast({
                 title: "Declare ended...",
