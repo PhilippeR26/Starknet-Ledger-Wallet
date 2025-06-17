@@ -60,7 +60,7 @@ This version of DAPP requests to connect the Ledger Nano to an USB connector of 
 Today, the DAPP is only working with the [devnet](https://0xspaceshard.github.io/starknet-devnet/docs/intro) network. 
 
 Note that to handle devnet, I am using this lib :  
-`"starknet-devnet": "0.4.0",`
+`"starknet-devnet": "0.4.2",`
 
 To use this lib, some code has to be added in `next.config.ts` :
 ```typescript

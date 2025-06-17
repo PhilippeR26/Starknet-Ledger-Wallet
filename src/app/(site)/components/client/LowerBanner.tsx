@@ -25,7 +25,7 @@ export default function LowerBanner() {
             textColor="black"
           >
             Powered by
-            <Link color="blue.700" href='https://starknetjs.com' isExternal> Starknet.js v7.2.0<ExternalLinkIcon mx='2px'></ExternalLinkIcon></Link>
+            <Link color="blue.700" href='https://starknetjs.com' isExternal> Starknet.js v7.5.1<ExternalLinkIcon mx='2px'></ExternalLinkIcon></Link>
             .
             <Link color="blue.700" href='https://github.com/PhilippeR26/Starknet-Ledger-Wallet' isExternal> Source code<ExternalLinkIcon mx='2px'></ExternalLinkIcon></Link>
             .
