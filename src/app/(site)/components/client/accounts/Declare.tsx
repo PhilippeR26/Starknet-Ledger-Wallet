@@ -19,7 +19,11 @@ export default function Declare() {
 
     async function declareClass() {
         const myProvider = myFrontendProviders[currentFrontendNetworkIndex];
-        const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], ledgerSigners![currentAccountID!]);
+        const myAccount = new Account({ 
+            provider: myFrontendProviders[2], 
+            address: starknetAddresses[currentAccountID!], 
+            signer: ledgerSigners![currentAccountID!] 
+        });
         const contractHash = hash.computeContractClassHash(contractSierra); console.log({ contractHash });
 
         try {

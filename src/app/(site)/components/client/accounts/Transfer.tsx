@@ -4,12 +4,12 @@ import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel, Input, S
 import { useGlobalContext } from "../globalContext";
 import QRCode from "react-qr-code";
 import { useForm } from "react-hook-form";
-import { CallData, num, json, Account, Contract, type Call, type GetTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress } from "starknet";
+import { CallData, num, json, Account, Contract, type Call, type GetTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress, type ResourceBoundsBN } from "starknet";
 import { useEffect, useRef, useState } from "react";
-import { addrETH, myFrontendProviders } from "@/utils/constants";
-import { calcHashTransaction } from "./calcAccount";
+import { addrETH, defaultTip, myFrontendProviders } from "@/utils/constants";
+import { calcHashTransaction, estimateFees } from "./calcAccount";
 import { erc20Abi } from "../../../contracts//abis/ERC20abi";
-import { formatAddress } from "@/utils/utils";
+import { formatAddress, wait } from "@/utils/utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import Declare from "./Declare";
 interface FormValues {
@@ -24,10 +24,12 @@ export default function Transfer() {
   const [amount, setAmount] = useState<string>("");
   const currentFrontendNetworkIndex = useGlobalContext(state => state.currentFrontendNetworkIndex);
   const starknetPublicKey = useGlobalContext(state => state.starknetPublicKey);
-  const [isBuild, setIsBuild] = useState<boolean>(false);
+  const [isBuild, setIsBuilt] = useState<boolean>(false);
   const [isTxApproved, setIsTxApproved] = useState<boolean>(false);
   const scrollRef = useRef<null | HTMLDivElement>(null);
   const [hash, setHash] = useState<string>("");
+  const [fees, setFees] = useState<ResourceBoundsBN>();
+  const [myCall, setMyCall] = useState<Call>();
   const [txH, setTxH] = useState<string>("");
   const [txR, setTxR] = useState<GetTransactionReceiptResponse | undefined>(undefined);
   const ledgerSigners = useGlobalContext(state => state.ledgerSigners);
@@ -43,21 +45,42 @@ export default function Transfer() {
   async function onSubmitResponse(values: FormValues) {
     setDestAddress(values.targetAddress);
     setAmount(values.amount);
-    setIsBuild(true);
+    setIsBuilt(true);
     console.log("calc hash inputs:", values);
-    setHash(await calcHash(values.targetAddress, values.amount));
+    const myCall0=await buildCall(values.targetAddress
+      , values.amount
+    );
+    setMyCall(myCall0);
+    const myAccount = new Account({
+      provider: myFrontendProviders[2],
+      address: starknetAddresses[currentAccountID!],
+      signer: await ledgerSigners![currentAccountID!]
+    });
+    const myFees: ResourceBoundsBN =  await estimateFees(myCall0, myAccount);
+    setFees(myFees);
+    const msgH=await calcHash(values.targetAddress, values.amount, myFees);
+    console.log("pre-calculated tx hash=", msgH);
+    setHash(msgH);
 
   }
 
   async function buildCall(addr: string, amountETH: string): Promise<Call> {
-    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], await ledgerSigners![currentAccountID!]);
-    const ethContract = new Contract(erc20Abi, addrETH, myAccount);
+    const myAccount = new Account({
+      provider: myFrontendProviders[2],
+      address: starknetAddresses[currentAccountID!],
+      signer: await ledgerSigners![currentAccountID!]
+    });
+    const ethContract = new Contract({
+      abi: erc20Abi,
+      address: addrETH,
+      providerOrAccount: myAccount
+    });
 
     let decimal: string = "";
     if (amountETH.includes(".")) { decimal = "." };
     if (amountETH.includes(",")) { decimal = "," };
     if (decimal == "") {
-      setIsBuild(false);
+      setIsBuilt(false);
       throw new Error("Wrong format of amount.");
     }
     const decimalPos = amountETH.indexOf(decimal);
@@ -79,15 +102,24 @@ export default function Transfer() {
   async function transferETH(addr: string, amountETH: string) {
     setIsTxApproved(true);
     const myProvider = myFrontendProviders[2];
-    const myCall = await buildCall(addr, amountETH);
+    // const myCall = await buildCall(addr, amountETH);
     console.log("transfer to sign");
-    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], ledgerSigners![currentAccountID!]);
-    const resp = await myAccount.execute(myCall);
+    const myAccount = new Account({
+      provider: myFrontendProviders[2],
+      address: starknetAddresses[currentAccountID!],
+      signer: ledgerSigners![currentAccountID!]
+    });
+    const resp = await myAccount.execute(myCall!, {tip: defaultTip, resourceBounds: fees});
     console.log("transferred!");
     setTxH(resp.transaction_hash);
     const txReceipt = await myProvider.waitForTransaction(resp.transaction_hash);
     setTxR(txReceipt);
     console.log(txReceipt.value);
+    await wait(8000);
+    setIsTxApproved(false);
+    setTxH("");
+    setTxR(undefined);
+    setIsBuilt(false);
 
   }
 
@@ -104,18 +136,23 @@ export default function Transfer() {
     }
   }
 
-  async function calcHash(addr: string, amountETH: string): Promise<string> {
-    const myAccount = new Account(myFrontendProviders[2], starknetAddresses[currentAccountID!], ledgerSigners![currentAccountID!]);
+  async function calcHash(addr: string, amountETH: string, myFees:ResourceBoundsBN): Promise<string> {
+    const myAccount = new Account({
+      provider: myFrontendProviders[2], 
+      address: starknetAddresses[currentAccountID!], 
+      signer: ledgerSigners![currentAccountID!]
+
+    });
     return calcHashTransaction(await buildCall(addr
       , amountETH
-    ), myAccount);
+    ),myFees,  myAccount);
   }
 
   function recoverError(txR: GetTransactionReceiptResponse): string {
     let resp: string = "";
     txR.match({
 
-      reverted: (txR: RevertedTransactionReceiptResponse) => {
+      REVERTED: (txR: RevertedTransactionReceiptResponse) => {
         resp = txR.execution_status + " " + txR.revert_reason
       },
       _: () => { resp = "" },
@@ -243,10 +280,13 @@ export default function Transfer() {
           <Center>
             <Button onClick={() => { transferETH(destAddress, amount) }}
               mt={2}
-              colorScheme="green"
+              disabled={isTxApproved}
+              colorScheme={isTxApproved?"orange":"green"}
               borderWidth={2}
               borderColor={"green.700"}
-            >Approve in your Ledger</Button>
+            >
+              {isTxApproved?<>In progress...</>: <>Approve in your Ledger</>}
+              </Button>
           </Center>
           {isTxApproved && (<>
             <Center>

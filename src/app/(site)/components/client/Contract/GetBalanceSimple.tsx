@@ -29,7 +29,11 @@ export default function GetBalanceSimple({ token, accountAddr }: Props) {
 
   const myProviderIndex = useFrontendProvider(state => state.currentFrontendProviderIndex);
   const myProvider = myFrontendProviders[myProviderIndex];
-  const contract = new Contract(erc20Abi, token, myProvider);
+  const contract = new Contract({ 
+    abi: erc20Abi, 
+    address: token, 
+    providerOrAccount: myProvider 
+  });
 
 
 
@@ -52,7 +56,7 @@ export default function GetBalanceSimple({ token, accountAddr }: Props) {
           <Spinner color="blue" size="sm" mr={4} />
         ) : (
           <>
-          {balance}{symbol}
+            {balance}{symbol}
           </>
         )
       }

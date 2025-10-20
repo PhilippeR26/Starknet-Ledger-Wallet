@@ -1,6 +1,6 @@
 "use client";
 import { Box, Center, Link, Select, useToast } from "@chakra-ui/react"
-import { Account, constants, RpcProvider, types, type CairoAssembly, type CompiledSierra } from "starknet";
+import { Account, constants, RpcProvider, type CairoAssembly, type CompiledSierra } from "starknet";
 import { useGlobalContext } from "./globalContext";
 import { useEffect, useState } from "react";
 import { accountClass, myFrontendProviders } from "@/utils/constants";
@@ -30,7 +30,7 @@ export default function SelectNetwork() {
         const devnetProvider = new DevnetProvider();
         const myProvider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" });
         const acc = await devnetProvider.getPredeployedAccounts();
-        const account0 = new Account(myProvider, acc[0].address, acc[0].private_key);
+        const account0 = new Account({ provider: myProvider, address: acc[0].address, signer: acc[0].private_key });
         const contractSierra = accountSierra as CompiledSierra;
         const contractCasm = accountCasm as CairoAssembly;
         let isDeclared: boolean = false;
@@ -61,10 +61,10 @@ export default function SelectNetwork() {
     }
         , [currentNetworkID]);
 
-        // only if devnet only :
-     useEffect(() => {
+    // only if devnet only :
+    useEffect(() => {
         setCurrentNetworkID(2);
-            declareAccount();
+        declareAccount();
     }
         , []);
 
@@ -106,7 +106,7 @@ export default function SelectNetwork() {
                 >
                     <option value='0' disabled={true}>Mainnet</option>
                     <option value='1' disabled={true}>Sepolia testnet</option>
-                    <option value='2'>Devnet 0.3+</option>
+                    <option value='2'>Devnet 0.5+</option>
                 </Select>
             </Center>
 

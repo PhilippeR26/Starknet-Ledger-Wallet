@@ -3,10 +3,10 @@
 
 import { RpcProvider, Account,  CallData, hash, LedgerSigner231 } from "starknet";
 import { DevnetProvider } from "starknet-devnet";
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 import { accountClass } from "@/utils/constants";
 import type { DeployAccountResp } from "@/type/types";
-dotenv.config();
+// dotenv.config();
 
 export async function deployAccountOpenzeppelin14(
   myProvider: RpcProvider,
@@ -31,7 +31,7 @@ export async function deployAccountOpenzeppelin14(
   await l2DevnetProvider.mint(OZcontractAddress, 10n * 10n ** 18n, "WEI");
   await l2DevnetProvider.mint(OZcontractAddress, 10n * 10n ** 18n, "FRI");
   // deploy account
-  const OZaccount = new Account(myProvider, OZcontractAddress, signer);
+  const OZaccount = new Account({provider: myProvider,address: OZcontractAddress, signer});
   console.log("deploy account in progress...");
   const { transaction_hash, contract_address } = await OZaccount.deployAccount({
     classHash: accountClass,
