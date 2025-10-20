@@ -3,7 +3,7 @@ import { Box, Center, Link, Select, useToast } from "@chakra-ui/react"
 import { Account, constants, RpcProvider, type CairoAssembly, type CompiledSierra } from "starknet";
 import { useGlobalContext } from "./globalContext";
 import { useEffect, useState } from "react";
-import { accountClass, myFrontendProviders } from "@/utils/constants";
+import { accountClass, defaultTip, myFrontendProviders } from "@/utils/constants";
 import { DevnetProvider } from "starknet-devnet";
 import accountSierra from "../../contracts/openzeppelin_AccountUpgradeable.sierra.json";
 import accountCasm from "../../contracts/openzeppelin_AccountUpgradeable.casm.json";
@@ -42,7 +42,11 @@ export default function SelectNetwork() {
         if (!isDeclared) {
             setIsDeclare(1);
             console.log("try declare");
-            const respDecl = await account0.declareIfNot({ contract: contractSierra, casm: contractCasm });
+            const respDecl = await account0.declareIfNot({
+                contract: contractSierra,
+                casm: contractCasm
+            }, { tip: defaultTip }
+            );
             if (respDecl.transaction_hash) {
                 await myProvider.waitForTransaction(respDecl.transaction_hash);
                 console.log("Account class declared in devnet at :", respDecl.class_hash)
