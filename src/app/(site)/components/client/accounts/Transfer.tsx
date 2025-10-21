@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel, Input, Spinner, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Center, Field, Input, Spinner, Text, Textarea } from "@chakra-ui/react";
+import { SquareArrowOutUpRight } from 'lucide-react';
 import { useGlobalContext } from "../globalContext";
 import QRCode from "react-qr-code";
 import { useForm } from "react-hook-form";
@@ -10,7 +11,6 @@ import { addrETH, defaultTip, myFrontendProviders } from "@/utils/constants";
 import { calcHashTransaction, estimateFees } from "./calcAccount";
 import { erc20Abi } from "../../../contracts//abis/ERC20abi";
 import { formatAddress, wait } from "@/utils/utils";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import Declare from "./Declare";
 interface FormValues {
   targetAddress: string,
@@ -47,7 +47,7 @@ export default function Transfer() {
     setAmount(values.amount);
     setIsBuilt(true);
     console.log("calc hash inputs:", values);
-    const myCall0=await buildCall(values.targetAddress
+    const myCall0 = await buildCall(values.targetAddress
       , values.amount
     );
     setMyCall(myCall0);
@@ -56,9 +56,9 @@ export default function Transfer() {
       address: starknetAddresses[currentAccountID!],
       signer: await ledgerSigners![currentAccountID!]
     });
-    const myFees: ResourceBoundsBN =  await estimateFees(myCall0, myAccount);
+    const myFees: ResourceBoundsBN = await estimateFees(myCall0, myAccount);
     setFees(myFees);
-    const msgH=await calcHash(values.targetAddress, values.amount, myFees);
+    const msgH = await calcHash(values.targetAddress, values.amount, myFees);
     console.log("pre-calculated tx hash=", msgH);
     setHash(msgH);
 
@@ -109,7 +109,7 @@ export default function Transfer() {
       address: starknetAddresses[currentAccountID!],
       signer: ledgerSigners![currentAccountID!]
     });
-    const resp = await myAccount.execute(myCall!, {tip: defaultTip, resourceBounds: fees});
+    const resp = await myAccount.execute(myCall!, { tip: defaultTip, resourceBounds: fees });
     console.log("transferred!");
     setTxH(resp.transaction_hash);
     const txReceipt = await myProvider.waitForTransaction(resp.transaction_hash);
@@ -136,16 +136,16 @@ export default function Transfer() {
     }
   }
 
-  async function calcHash(addr: string, amountETH: string, myFees:ResourceBoundsBN): Promise<string> {
+  async function calcHash(addr: string, amountETH: string, myFees: ResourceBoundsBN): Promise<string> {
     const myAccount = new Account({
-      provider: myFrontendProviders[2], 
-      address: starknetAddresses[currentAccountID!], 
+      provider: myFrontendProviders[2],
+      address: starknetAddresses[currentAccountID!],
       signer: ledgerSigners![currentAccountID!]
 
     });
     return calcHashTransaction(await buildCall(addr
       , amountETH
-    ),myFees,  myAccount);
+    ), myFees, myAccount);
   }
 
   function recoverError(txR: GetTransactionReceiptResponse): string {
@@ -196,10 +196,10 @@ export default function Transfer() {
           fontSize={"md"}
           fontWeight={"bold"}>
           {" " + starknetAddresses[currentAccountID] + "  "}
-          <ExternalLinkIcon
-            mx='2px'
+          <SquareArrowOutUpRight
+            margin-left='2px'
             onClick={() => { navigator.clipboard.writeText(validateAndParseAddress(starknetAddresses[currentAccountID])) }}
-          ></ExternalLinkIcon>
+          />
         </Center>
         <Center pb={2}>
           <QRCode
@@ -210,27 +210,27 @@ export default function Transfer() {
         </Center >
         <Center>
           <form onSubmit={handleSubmit(onSubmitResponse)}>
-            <FormControl isInvalid={errors.targetAddress as any}>
-              <FormLabel htmlFor="encoded"> Destination address (0x 64 characters) :</FormLabel>
+            <Field.Root invalid={errors.targetAddress as any}>
+              <Field.Label htmlFor="encoded"> Destination address (0x 64 characters) :</Field.Label>
               <Input w="100%" minH={50} maxH={500}
                 bg="gray.800"
-                textColor="blue.200"
+                color="blue.200"
                 defaultValue={destAddress}
                 id="encoded"
                 {...register("targetAddress", {
                   required: "This is required. Ex: 0x0123..a2c", pattern: /^(0x)?[0-9a-fA-F]{64}$/
                 })}
               />
-              <FormErrorMessage color={"darkred"}>
+              <Field.ErrorText color={"darkred"}>
                 {errors.targetAddress && errors.targetAddress.message}
                 {errors.targetAddress && errors.targetAddress.type == "pattern" && <span>Not a 64 char hex address</span>}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={errors.amount as any}>
-              <FormLabel htmlFor="amount0" pt={3}> ETH amount :</FormLabel>
+              </Field.ErrorText>
+            </Field.Root>
+            <Field.Root invalid={errors.amount as any}>
+              <Field.Label htmlFor="amount0" pt={3}> ETH amount :</Field.Label>
               <Input w="100%" minH={50} maxH={500}
                 bg="gray.800"
-                textColor="blue.200"
+                color="blue.200"
                 defaultValue={amount}
                 id="amount0"
                 {...register("amount", {
@@ -238,27 +238,16 @@ export default function Transfer() {
                   pattern: /^\d+[\.,]?\d*$/
                 })}
               />
-              <FormErrorMessage color={"darkred"}>
+              <Field.ErrorText color={"darkred"}>
                 {errors.amount && errors.amount.message}
                 {errors.amount && errors.amount.type == "pattern" && <span>Not a number</span>}
-              </FormErrorMessage>
-            </FormControl>
-            {/* <Input
-              color={"white"}
-              fontWeight={"bold"}
-              value="Build transfer"
-              bg={"royalblue"}
-              _hover={{
-                background: "darkblue",
-                color: "white",
-              }}
-              mt={2}
-              type="submit" /> */}
+              </Field.ErrorText>
+            </Field.Root>
             <Center>
               <Button
-                colorScheme="blue"
+                colorPalette="blue"
                 mt={2}
-                isLoading={isSubmitting}
+                loading={isSubmitting}
                 borderWidth={2}
                 borderColor={isValid ? "lightblue" : "red"}
                 type="submit"
@@ -268,12 +257,12 @@ export default function Transfer() {
         </Center>
         {isBuild && (<>
           <Text
-            align={"center"}
+            textAlign={"center"}
             fontSize={"x-large"}
             fontWeight={900} >
             You want to transfer {amount}Eth to {formatAddress(destAddress)},
           </Text>
-          <Text align={"center"}>
+          <Text textAlign={"center"}>
             Expected tx hash {hash}
             <br></br>
           </Text>
@@ -281,12 +270,12 @@ export default function Transfer() {
             <Button onClick={() => { transferETH(destAddress, amount) }}
               mt={2}
               disabled={isTxApproved}
-              colorScheme={isTxApproved?"orange":"green"}
+              colorPalette={isTxApproved ? "orange" : "green"}
               borderWidth={2}
               borderColor={"green.700"}
             >
-              {isTxApproved?<>In progress...</>: <>Approve in your Ledger</>}
-              </Button>
+              {isTxApproved ? <>In progress...</> : <>Approve in your Ledger</>}
+            </Button>
           </Center>
           {isTxApproved && (<>
             <Center>

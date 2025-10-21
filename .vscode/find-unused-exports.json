@@ -1,0 +1,8 @@
+{
+  "ignore": {
+    "files": [
+      "/D/Starknet/Starknet-Ledger-Wallet/src/app/(site)/page.tsx",
+      "/D/Starknet/Starknet-Ledger-Wallet/src/app/(site)/layout.tsx"
+    ]
+  }
+}

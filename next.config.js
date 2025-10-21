@@ -12,7 +12,8 @@ const nextConfig = {
       child_process: false,
     }
     return config;
-  }
+  },
+  experimental:{optimizePackageImports:["@chakra-ui/react"]}
 }
 
 module.exports = nextConfig

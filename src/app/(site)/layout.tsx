@@ -1,7 +1,10 @@
-import './globals.css';
+import type { Metadata } from 'next';
+// import './globals.css';
+import {Provider} from "@/components/ui/provider";
+
 import { ChakraProvider } from '@chakra-ui/react'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Starknet-Ledger-Wallet',
   description: 'Demo of Ledger Wallet for Starknet',
   icons: {
@@ -9,17 +12,16 @@ export const metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout(
+ props: { children: React.ReactNode }
+) {
+  const { children } = props
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <body>
-        <ChakraProvider>
+        <Provider>
           {children}
-        </ChakraProvider>
+        </Provider>
       </body>
     </html>
   )

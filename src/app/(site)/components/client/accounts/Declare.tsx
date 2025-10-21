@@ -1,4 +1,5 @@
-import { Button, Center, useToast } from "@chakra-ui/react";
+import { Button, Center } from "@chakra-ui/react";
+import { toaster, Toaster } from "@/components/ui/toaster";
 import { useEffect, useRef, useState } from "react";
 import contractSierra from "../../../contracts/counter.sierra.json";
 import contractCasm from "../../../contracts/counter.casm.json";
@@ -11,7 +12,6 @@ export default function Declare() {
     const currentAccountID = useGlobalContext(state => state.currentAccountID);
     const starknetAddresses = useGlobalContext(state => state.starknetAddresses);
     const currentFrontendNetworkIndex = useGlobalContext(state => state.currentFrontendNetworkIndex);
-    const toast = useToast();
     const scrollRef = useRef<null | HTMLDivElement>(null);
     const ledgerSigners = useGlobalContext(state => state.ledgerSigners);
 
@@ -30,20 +30,18 @@ export default function Declare() {
             await myProvider.getClassByHash(contractHash);
             console.log("already declared");
 
-            toast({
+            toaster.create({
                 title: "Error.",
                 description: "Already declared.",
                 duration: 10_000,
-                isClosable: true,
-                position: "bottom-right"
+                closable: true,
             });
         } catch {
-            toast({
+            toaster.create({
                 title: "Declare in progress...",
                 description: "Approve in the Ledger and wait",
                 duration: 10_000,
-                isClosable: true,
-                position: "bottom-right"
+                closable: true,
             });
             console.log("try declare");
             const respDecl = await myAccount.declareIfNot({ contract: contractSierra, casm: contractCasm });
@@ -51,12 +49,11 @@ export default function Declare() {
                 await myProvider.waitForTransaction(respDecl.transaction_hash);
                 console.log("contract class declared in devnet at :", respDecl.class_hash)
             }
-            toast({
+            toaster.create({
                 title: "Declare ended...",
                 description: "Success",
                 duration: 10_000,
-                isClosable: true,
-                position: "bottom-right"
+                closable: true,
             });
             setDeclareStatus(true);
         }
@@ -80,10 +77,11 @@ export default function Declare() {
 
     return (
         <div ref={scrollRef}>
+            <Toaster></Toaster>
             <Center>
                 <Button
                     mt={5}
-                    colorScheme="orange"
+                    colorPalette={"orange"}
                     onClick={() => { declareClass() }}
                 >
                     Test Declare

@@ -12,15 +12,14 @@ export default function LedgerWallet() {
     <>
       <Box bg={"steelblue"} pb={2}>
         <SelectNetwork></SelectNetwork>
-        <Text align={"center"}>
-          Connect your Ledger NanoS+ or NanoX<br></br>
-          to an USB connector <br></br>
-          and select the Starknet App.<br></br>
-          Then click on 'Go'
-        </Text>
+        <Center>
+          Connect your Ledger NanoS+ or NanoX</Center>
+        <Center>  to an USB connector</Center>
+        <Center>  and select the Starknet App.</Center>
+        <Center>  Then click on 'Go'</Center>
+        
         <DisplayAccounts></DisplayAccounts>
       </Box>
-      <Transfer></Transfer>
     </>
   )
 }

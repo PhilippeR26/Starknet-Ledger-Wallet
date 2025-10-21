@@ -1,5 +1,6 @@
 "use client";
-import { Box, Center, Link, Select, useToast } from "@chakra-ui/react"
+import { Center, Portal, Select, createListCollection } from "@chakra-ui/react"
+import { Toaster, toaster } from "@/components/ui/toaster"
 import { Account, constants, RpcProvider, type CairoAssembly, type CompiledSierra } from "starknet";
 import { useGlobalContext } from "./globalContext";
 import { useEffect, useState } from "react";
@@ -11,8 +12,8 @@ import accountCasm from "../../contracts/openzeppelin_AccountUpgradeable.casm.js
 export default function SelectNetwork() {
     const currentNetworkID = useGlobalContext(state => state.currentFrontendNetworkIndex);
     const setCurrentNetworkID = useGlobalContext(state => state.setCurrentFrontendNetworkIndex);
-    const [selectedOption, setSelectedOption] = useState<string>("2");
-    const toast = useToast();
+    const [selectedOption, setSelectedOption] = useState<string[]>(["2"]);
+    // const toast = useToast();
     const [isDeclare, setIsDeclare] = useState<number>(0);
 
     const handleSelectChange = (event: any) => {
@@ -23,6 +24,14 @@ export default function SelectNetwork() {
             setCurrentNetworkID(Number(selectedValue));
         }
     };
+
+    const networkList = createListCollection({
+        items: [
+            { value: '0', label: 'Mainnet' },
+            { value: '1', label: 'Sepolia testnet' },
+            { value: '2', label: 'Devnet 0.6+' },
+        ]
+    })
 
     async function declareAccount() {
         //const resp= await myFrontendProviders[2].getClassByHash(accountClass);
@@ -74,44 +83,69 @@ export default function SelectNetwork() {
 
     useEffect(() => {
         if (isDeclare == 1) {
-            toast({
+            toaster.create({
                 title: "Declare in progress...",
                 description: "Do not click Go now.",
                 duration: 15_000,
-                isClosable: true,
-                position: "bottom-right"
+                closable: true,
             })
         }
         else if (isDeclare == 2) {
-            toast({
+            toaster.create({
                 title: "Account class declared.",
                 description: "You can click on Go when Ledger APP active",
                 duration: 10_000,
-                isClosable: true,
-                position: "bottom-right"
+                closable: true,
             })
         }
     }, [isDeclare]);
 
     return (
         <>
+            <Toaster />
             <Center fontSize={"x-large"} mt={2}>
                 Select a Starknet network
             </Center>
             <Center>
-                <Select
-                    colorScheme="blue"
-                    onChange={handleSelectChange}
+                <Select.Root
+                    collection={networkList}
+                    onValueChange={handleSelectChange}
                     value={selectedOption}
                     w={170}
                     mt={1}
                     mb={2}
+                    size={"lg"}
                     bg={"dodgerblue"}
+                    borderStyle={"unset"}
+                    borderWidth={4}
+                    borderColor={"dodgerblue"}
                 >
-                    <option value='0' disabled={true}>Mainnet</option>
-                    <option value='1' disabled={true}>Sepolia testnet</option>
-                    <option value='2'>Devnet 0.5+</option>
-                </Select>
+                    <Select.HiddenSelect />
+                    <Select.Control>
+                        <Select.Trigger>
+                            <Select.ValueText placeholder="Select framework" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                            <Select.Indicator />
+                        </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Portal>
+                        <Select.Positioner>
+                            <Select.Content>
+                                {networkList.items.map((network) => (
+                                    <Select.Item
+                                        aria-disabled={network.value == "2" ? false : true}
+                                        item={network}
+                                        key={network.value}
+                                    >
+                                        {network.label}
+                                        <Select.ItemIndicator />
+                                    </Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select.Positioner>
+                    </Portal>
+                </Select.Root>
             </Center>
 
         </>
