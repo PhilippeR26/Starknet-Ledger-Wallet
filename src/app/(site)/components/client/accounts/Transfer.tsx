@@ -1,11 +1,11 @@
 "use client";
 
-import { Box, Button, Center, Field, Input, Spinner, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Center, Field, Input, Spinner, Text } from "@chakra-ui/react";
 import { SquareArrowOutUpRight } from 'lucide-react';
 import { useGlobalContext } from "../globalContext";
 import QRCode from "react-qr-code";
 import { useForm } from "react-hook-form";
-import { CallData, num, json, Account, Contract, type Call, type GetTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress, type ResourceBoundsBN } from "starknet";
+import { Account, Contract, type Call, type GetTransactionReceiptResponse, type RevertedTransactionReceiptResponse, validateAndParseAddress, type ResourceBoundsBN } from "starknet";
 import { useEffect, useRef, useState } from "react";
 import { addrETH, defaultTip, myFrontendProviders } from "@/utils/constants";
 import { calcHashTransaction, estimateFees } from "./calcAccount";

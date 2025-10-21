@@ -7,7 +7,6 @@ import { Center } from '@chakra-ui/react';
 import ledgerNano from "@/public/Images/LedgerTitle.png";
 import LedgerWallet from './components/client/LedgerWallet';
 import TopBanner from './components/client/TopBanner';
-import Test from './components/client/Test';
 
 export default async function Page() {
 

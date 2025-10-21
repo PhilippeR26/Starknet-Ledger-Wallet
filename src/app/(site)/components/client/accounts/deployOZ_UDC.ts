@@ -1,7 +1,7 @@
 // Deploy an OpenZeppelin 0.14.0 account in devnet.
 // Coded with Starknet.js v7.1.0 & devnet v0.4.0 & starknet-devnet.js v0.4.0
 
-import { RpcProvider, Account, Contract, ec, stark, num, uint256, Calldata, CallData, shortString, constants, hash, type Call, events, provider, type InvokeFunctionResponse, type InvokeTransactionReceiptResponse, type SuccessfulTransactionReceiptResponse, LedgerSigner231 } from "starknet";
+import { RpcProvider, Account, ec, stark, Calldata, CallData, constants, hash, type Call, type InvokeFunctionResponse, type InvokeTransactionReceiptResponse, type SuccessfulTransactionReceiptResponse, LedgerSigner231 } from "starknet";
 import { DevnetProvider } from "starknet-devnet";
 import accountSierra from "../../../contracts/openzeppelin_AccountUpgradeable.sierra.json";
 import * as dotenv from "dotenv";

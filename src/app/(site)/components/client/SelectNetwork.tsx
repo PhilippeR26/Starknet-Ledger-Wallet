@@ -1,10 +1,10 @@
 "use client";
 import { Center, Portal, Select, createListCollection } from "@chakra-ui/react"
 import { Toaster, toaster } from "@/components/ui/toaster"
-import { Account, constants, RpcProvider, type CairoAssembly, type CompiledSierra } from "starknet";
+import { Account, RpcProvider, type CairoAssembly, type CompiledSierra } from "starknet";
 import { useGlobalContext } from "./globalContext";
 import { useEffect, useState } from "react";
-import { accountClass, defaultTip, myFrontendProviders } from "@/utils/constants";
+import { accountClass, defaultTip } from "@/utils/constants";
 import { DevnetProvider } from "starknet-devnet";
 import accountSierra from "../../contracts/openzeppelin_AccountUpgradeable.sierra.json";
 import accountCasm from "../../contracts/openzeppelin_AccountUpgradeable.casm.json";

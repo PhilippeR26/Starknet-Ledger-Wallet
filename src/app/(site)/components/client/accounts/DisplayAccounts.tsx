@@ -1,14 +1,14 @@
 "use client";
-import { Box, Button, Center, Link, RadioCard, RadioGroup, Spinner, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Center, RadioCard, Spinner, Stack } from "@chakra-ui/react"
 import { toaster, Toaster } from "@/components/ui/toaster";
 import { useEffect, useRef, useState } from "react";
 import { useGlobalContext } from "../globalContext";
-import { NB_ACCOUNTS, addrETH, myFrontendProviders, tokenAddr } from "@/utils/constants";
+import { NB_ACCOUNTS, myFrontendProviders, tokenAddr } from "@/utils/constants";
 import { CalcAccountsAddress, createSignerList, createTransport } from "./calcAccount";
 import { formatAddress } from "@/utils/utils";
 import type { DeployAccountResp } from "@/type/types";
 import { deployAccountOpenzeppelin14 } from "./deployOZ";
-import { Contract, validateAndParseAddress, type LedgerSigner231 } from "starknet";
+import { validateAndParseAddress, type LedgerSigner231 } from "starknet";
 import GetBalanceSimple from "../Contract/GetBalanceSimple";
 import type Transport from "@ledgerhq/hw-transport";
 import { SquareArrowOutUpRight } from 'lucide-react';
@@ -57,7 +57,7 @@ export default function DisplayAccounts() {
       console.log("version=", appVersion);
       setAppVersion(appVersion);
       setIsAPPconnectedLocal(true);
-      let pkList: string[] = [];
+      const pkList: string[] = [];
       for (let id: number = 0; id < NB_ACCOUNTS; id++) {
         pkList[id] = await mySignersList[id].getPubKey();
         console.log("pubK", id, "=", pkList[id]);
@@ -122,7 +122,7 @@ export default function DisplayAccounts() {
   useEffect(() => {
     if (selectedAccount !== "") setCurrentAccountID(Number(selectedAccount));
   }
-    , [selectedAccount]
+    , [setCurrentAccountID, selectedAccount]
   );
 
   useEffect(() => {

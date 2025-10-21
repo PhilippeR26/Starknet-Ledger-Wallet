@@ -1,8 +1,7 @@
 import { accountClass, defaultTip } from "@/utils/constants";
-import { CallData, constants, hash, num, stark, transaction, TransactionType, validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call, type V3InvocationsSignerDetails, LedgerSigner231, type ResourceBounds, type InvocationsDetailsWithNonce, type UniversalDetails, type ResourceBoundsBN, type Invocation, type RPC, type RPC09, type RPC08 } from "starknet";
-import { ETransactionType, ETransactionVersion, ETransactionVersion2, ETransactionVersion3, type INVOKE_TXN_V3 } from "@starknet-io/types-js";
+import { CallData, hash, num, stark, transaction,  validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call,  LedgerSigner231, type UniversalDetails, type ResourceBoundsBN, } from "starknet";
+import { ETransactionVersion3 } from "@starknet-io/types-js";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
-import TransportWebBluetooth from "@ledgerhq/hw-transport-web-ble";
 import type Transport from "@ledgerhq/hw-transport";
 
 

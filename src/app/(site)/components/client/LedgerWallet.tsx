@@ -1,5 +1,5 @@
 "use client";
-import { Box, Center, Link, Text } from "@chakra-ui/react"
+import { Box, Center } from "@chakra-ui/react"
 import SelectNetwork from "./SelectNetwork";
 import DisplayAccounts from "./accounts/DisplayAccounts";
 import Transfer from "./accounts/Transfer";

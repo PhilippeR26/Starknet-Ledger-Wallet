@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Contract, shortString } from "starknet";
+import { Contract } from "starknet";
 
 
-import { Text, Center, Spinner, } from "@chakra-ui/react";
-import styles from '../../../page.module.css'
+import { Spinner, } from "@chakra-ui/react";
 
 import { erc20Abi } from "../../../contracts/abis/ERC20abi"
-import { useStoreWallet } from "../ConnectWallet/walletContext"; import { useFrontendProvider } from '../provider/providerContext';
+import { useFrontendProvider } from '../provider/providerContext';
 import { myFrontendProviders, tokenAddr } from '@/utils/constants';
 import { formatBalanceShort } from '@/utils/utils';
 ;
@@ -28,10 +27,10 @@ export default function GetBalanceSimple({ token, accountAddr }: Props) {
 
   const myProviderIndex = useFrontendProvider(state => state.currentFrontendProviderIndex);
   const myProvider = myFrontendProviders[myProviderIndex];
-  const contract = new Contract({ 
-    abi: erc20Abi, 
-    address: token, 
-    providerOrAccount: myProvider 
+  const contract = new Contract({
+    abi: erc20Abi,
+    address: token,
+    providerOrAccount: myProvider
   });
 
 

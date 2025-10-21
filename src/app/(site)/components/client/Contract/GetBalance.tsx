@@ -61,7 +61,7 @@ export default function GetBalance({ tokenAddress }: Props) {
             )
             .catch((e: any) => { console.log("error balanceOf=", e) });
     }
-        , [blockFromContext.block_number, decimals]); // balance updated at each block
+        , [blockFromContext.block_number, decimals, accountAddress, contract]); // balance updated at each block
 
     return (
         <>
