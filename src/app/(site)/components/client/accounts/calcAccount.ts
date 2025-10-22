@@ -1,4 +1,4 @@
-import { accountClass, defaultTip } from "@/utils/constants";
+import { accountClass, defaultTip, NB_ACCOUNTS } from "@/utils/constants";
 import { CallData, hash, num, stark, transaction,  validateAndParseAddress, type Account, type AllowArray, type BigNumberish, type Call,  LedgerSigner231, type UniversalDetails, type ResourceBoundsBN, } from "starknet";
 import { ETransactionVersion3 } from "@starknet-io/types-js";
 import TransportWebHid from "@ledgerhq/hw-transport-webhid";
@@ -11,7 +11,7 @@ export async function createTransport(): Promise<Transport> {
 }
 export async function createSignerList(myTransport: Transport): Promise<LedgerSigner231<any>[]> {
     const signerListTmp: LedgerSigner231<any>[] = [];
-    for (let id: number = 0; id < 5; id++) {
+    for (let id: number = 0; id < NB_ACCOUNTS; id++) {
         signerListTmp.push(new LedgerSigner231(myTransport, id));
     }
     return signerListTmp;
@@ -31,7 +31,7 @@ export async function estimateFees(call: Call, account: Account): Promise<Resour
     return estimate.resourceBounds
 }
 
-// precalculate a transaction hash, using the Call, ressourceBoundsBN (from estimateInvokeFee), and using defaultTip constant.
+// precalculate a transaction hash, using the Call, resourceBoundsBN (from estimateInvokeFee), and using defaultTip constant.
 export async function calcHashTransaction(
     calls: AllowArray<Call>,
     myFees: ResourceBoundsBN,

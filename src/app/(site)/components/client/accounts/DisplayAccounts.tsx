@@ -1,6 +1,7 @@
 "use client";
 import { Box, Button, Center, RadioCard, Spinner, Stack } from "@chakra-ui/react"
 import { toaster, Toaster } from "@/components/ui/toaster";
+import { SquareArrowOutUpRight } from 'lucide-react';
 import { useEffect, useRef, useState } from "react";
 import { useGlobalContext } from "../globalContext";
 import { NB_ACCOUNTS, myFrontendProviders, tokenAddr } from "@/utils/constants";
@@ -11,7 +12,6 @@ import { deployAccountOpenzeppelin14 } from "./deployOZ";
 import { validateAndParseAddress, type LedgerSigner231 } from "starknet";
 import GetBalanceSimple from "../Contract/GetBalanceSimple";
 import type Transport from "@ledgerhq/hw-transport";
-import { SquareArrowOutUpRight } from 'lucide-react';
 import Transfer from "./Transfer";
 
 
@@ -31,7 +31,7 @@ export default function DisplayAccounts() {
   const setStarknetAddresses = useGlobalContext(state => state.setStarknetAddresses);
   const setCurrentAccountID = useGlobalContext(state => state.setCurrentAccountID);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
-  const [isDeployed, setIsDeployed] = useState<boolean[]>(new Array(5).fill(false));
+  const [isDeployed, setIsDeployed] = useState<boolean[]>(new Array(NB_ACCOUNTS).fill(false));
   const [isDeployProcessing, SetIsDeployProcessing] = useState<number>(1000);
   const currentFrontendNetworkIndex = useGlobalContext(state => state.currentFrontendNetworkIndex);
   const [deployInProgress, setDeployInProgress] = useState<number>(0);
