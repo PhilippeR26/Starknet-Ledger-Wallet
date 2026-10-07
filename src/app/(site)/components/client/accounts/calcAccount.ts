@@ -45,7 +45,7 @@ export async function calcHashTransaction(
     ): Promise<UniversalDetails & { tip: BigNumberish }> {
         return {
             ...details,
-            tip: details.tip ?? (await account.getEstimateTip())[account.defaultTipType],
+            tip: details.tip ?? (await account.provider.getEstimateTip())[account.defaultTipType],
         };
     }
 
@@ -71,7 +71,7 @@ export async function calcHashTransaction(
     };
     const { nonce, skipValidate = true } = details2;
     const safeNonce = num.toBigInt(nonce ?? (await account.getNonce()));
-    const chainId = await account.getChainId();
+    const chainId = await account.provider.getChainId();
     const versions = details2.versions.map((it) => stark.toTransactionVersion(it));
     const cairoVersion = await account.getCairoVersion();
     const signerDetails = {
